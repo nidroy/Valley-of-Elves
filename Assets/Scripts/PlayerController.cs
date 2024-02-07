@@ -23,7 +23,6 @@ public class PlayerController : MonoBehaviour
         float vertical = Input.GetAxisRaw("Vertical");
 
         movement = new Vector2(horizontal, vertical).normalized;
-        Debug.Log(movement);
 
         anim.SetFloat("Horizontal", horizontal);
         anim.SetFloat("Vertical", vertical);
