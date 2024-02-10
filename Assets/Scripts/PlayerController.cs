@@ -10,6 +10,7 @@ public class PlayerController : MonoBehaviour
     private Animator anim;
 
     private Vector2 movement;
+    private bool isPickup;
 
     private void Start()
     {
@@ -19,6 +20,15 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            isPickup = true;
+        }
+        if (Input.GetKeyUp(KeyCode.E))
+        {
+            isPickup = false;
+        }
+
         float horizontal = Input.GetAxisRaw("Horizontal");
         float vertical = Input.GetAxisRaw("Vertical");
 
@@ -30,6 +40,16 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        rb.MovePosition(rb.position + movement * moveSpeed * Time.fixedDeltaTime);
+        anim.SetBool("isPickup", isPickup);
+
+        if (!isPickup)
+        {
+            rb.MovePosition(rb.position + movement * moveSpeed * Time.fixedDeltaTime);
+        }
+    }
+
+    private void Pickup()
+    {
+        
     }
 }
