@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: b3771d8d0dc80b348a6ccba853cac7da
+timeCreated: 1527363946
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 55845
+  packageName: 2D Asset Pack - 5 Worlds
+  packageVersion: 2.2
+  assetPath: Assets/Five Worlds Asset Pack/Prefabs/Swamp Level/platforms/swamp_small_bridge.prefab
+  uploadId: 592465

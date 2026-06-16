@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 423aacd75084ee04998bdcdc3b85ae51
+timeCreated: 1451170611
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 55845
+  packageName: 2D Asset Pack - 5 Worlds
+  packageVersion: 2.2
+  assetPath: Assets/Five Worlds Asset Pack/Animation/pickup.controller
+  uploadId: 592465

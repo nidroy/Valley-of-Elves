@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: f9e50e832be0c3443af974afd9cb923f
+timeCreated: 1527266250
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 55845
+  packageName: 2D Asset Pack - 5 Worlds
+  packageVersion: 2.2
+  assetPath: Assets/Five Worlds Asset Pack/Prefabs/Fantasy Level/decorations/Glowing_mushroom.prefab
+  uploadId: 592465

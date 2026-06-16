@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: a747740847cebaa448e2da217fe585fd
+timeCreated: 1527085659
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 7400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 55845
+  packageName: 2D Asset Pack - 5 Worlds
+  packageVersion: 2.2
+  assetPath: Assets/Five Worlds Asset Pack/Animation/waterfall1.anim
+  uploadId: 592465

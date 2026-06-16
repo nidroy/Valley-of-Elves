@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 40b7a63691378c74996fa70bb94f0bd1
+timeCreated: 1527358056
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 55845
+  packageName: 2D Asset Pack - 5 Worlds
+  packageVersion: 2.2
+  assetPath: Assets/Five Worlds Asset Pack/Prefabs/Lava Level/background elements/lava_top_crystals_1_vfx.prefab
+  uploadId: 592465

@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: eb45adcb1113c644d82b939a42fe2855
+timeCreated: 1527265879
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 55845
+  packageName: 2D Asset Pack - 5 Worlds
+  packageVersion: 2.2
+  assetPath: Assets/Five Worlds Asset Pack/Prefabs/Fantasy Level/platforms/fantasy_bridge_crossing.prefab
+  uploadId: 592465

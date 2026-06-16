@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: d3e0eb2dca8bc8e46bfc5c00ebb1efe4
+timeCreated: 1527266001
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 55845
+  packageName: 2D Asset Pack - 5 Worlds
+  packageVersion: 2.2
+  assetPath: Assets/Five Worlds Asset Pack/Prefabs/Fantasy Level/platforms/fantasy_floating_platform_green_wisps.prefab
+  uploadId: 592465
