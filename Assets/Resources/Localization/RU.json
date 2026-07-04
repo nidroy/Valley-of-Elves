@@ -1,0 +1,56 @@
+{
+  "Words": [
+    {
+      "Key": "Main menu title",
+      "Value": "Долина Эльфов"
+    },
+    {
+      "Key": "New game button",
+      "Value": "Новая игра"
+    },
+    {
+      "Key": "Continue button",
+      "Value": "Продолжить"
+    },
+    {
+      "Key": "Settings button",
+      "Value": "Настройки"
+    },
+    {
+      "Key": "Quit game button",
+      "Value": "Выйти"
+    },
+    {
+      "Key": "Screen resolution title",
+      "Value": "Разрешение экрана"
+    },
+    {
+      "Key": "Localization title",
+      "Value": "Локализация"
+    },
+    {
+      "Key": "Full screen title",
+      "Value": "Полноэкранный режим"
+    },
+    {
+      "Key": "File logging title",
+      "Value": "Ведение журнала"
+    },
+    {
+      "Key": "Music volume title",
+      "Value": "Громкость музыки"
+    },
+    {
+      "Key": "Sound volume title",
+      "Value": "Громкость звуков"
+    },
+    {
+      "Key": "Apply button",
+      "Value": "Применить"
+    },
+    {
+      "Key": "Cancel button",
+      "Value": "Отменить"
+    }
+  ]
+}

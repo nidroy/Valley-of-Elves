@@ -1,0 +1,56 @@
+{
+  "Words": [
+    {
+      "Key": "Main menu title",
+      "Value": "Valley of Elves"
+    },
+    {
+      "Key": "New game button",
+      "Value": "New Game"
+    },
+    {
+      "Key": "Continue button",
+      "Value": "Continue"
+    },
+    {
+      "Key": "Settings button",
+      "Value": "Settings"
+    },
+    {
+      "Key": "Quit game button",
+      "Value": "Quit Game"
+    },
+    {
+      "Key": "Screen resolution title",
+      "Value": "Screen resolution"
+    },
+    {
+      "Key": "Localization title",
+      "Value": "Localization"
+    },
+    {
+      "Key": "Full screen title",
+      "Value": "Full screen"
+    },
+    {
+      "Key": "File logging title",
+      "Value": "File logging"
+    },
+    {
+      "Key": "Music volume title",
+      "Value": "Music volume"
+    },
+    {
+      "Key": "Sound volume title",
+      "Value": "Sound volume"
+    },
+    {
+      "Key": "Apply button",
+      "Value": "Apply"
+    },
+    {
+      "Key": "Cancel button",
+      "Value": "Cancel"
+    }
+  ]
+}
