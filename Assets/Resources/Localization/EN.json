@@ -51,6 +51,10 @@
     {
       "Key": "Cancel button",
       "Value": "Cancel"
+    },
+    {
+      "Key": "Loading screen text",
+      "Value": "The legends of the magical land of Farrun have been stirring the minds of sages for many years. After all, it was created by the Old Gods and hidden from prying eyes by a magic dome. These ancient lands are full of magic and inhabited by creatures that the elven eye has never seen. Farrun would have continued to be a fiction if a bright star had not fallen from the sky, which destroyed the magic dome. Needless to say, the leaders of the Elven nations immediately declared their rights to Farrun. Someone needs a central White castle where the great dragon Ebrung sleeps, someone seeks to capture magic towers that give the owners the ability to teleport their warriors, and someone just needs to expand the size of their empire. However, there is one small difficulty. The new gods are not very happy to see Farrun torn apart by the Elven rulers, so they have sent their best heroes to confront the elves. Mistress of Time, Eldagar and Atranax, the mighty servants of the new gods, have already arrived in the legendary land and are raising a rebellion of the local peoples against the elven rulers."
     }
   ]
 }

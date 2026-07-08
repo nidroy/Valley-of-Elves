@@ -4,50 +4,94 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// Класс управляет меню настроек игры.
+/// </summary>
 public class SettingsMenuManager : MonoBehaviour
 {
-    [SerializeField]
-    private GameObject _settingsMenuObject; // Объект, отображающий меню настроек
-    [SerializeField]
-    private TMP_Dropdown _screenResolutionDropdown; // Поле для выбора разрешения экрана
-    [SerializeField]
-    private TMP_Dropdown _localizationDropdown; // Поле для выбора локализации игры
-    [SerializeField]
-    private Toggle _fullScreenToggle; // Чекбокс для переключения состояния полноэкранного режима
-    [SerializeField]
-    private Toggle _fileLoggingToggle; // Чекбокс для переключения состояния записи логов в файл
-    [SerializeField]
-    private Slider _musicVolumeSlider; // Слайдер для управления громкостью музыки
-    [SerializeField]
-    private Slider _soundVolumeSlider; // Слайдер для управления громкостью звуков
-    [SerializeField]
-    private TMP_Text _musicVolumeText; // Текстовое поле для отображения значения громкости музыки
-    [SerializeField]
-    private TMP_Text _soundVolumeText; // Текстовое поле для отображения значения громкости звуков
-    [SerializeField]
-    private AudioSource _musicSource; // Источник звука для музыки
-    [SerializeField]
-    private AudioSource[] _soundSource; // Источники звука для звуков
-    [SerializeField]
-    private List<Word> _words; // Текстовые поля для отображения слов в игре с ключевыми словами для них
+    #region Приватные поля
 
-    // <summary>
-    /// Класс для хранения текстовых полей для отображения слов в игре с ключевыми словами для них
+    // Выпадающий список разрешения экрана.
+    [SerializeField]
+    private TMP_Dropdown _screenResolutionDropdown;
+
+    // Выпадающий список локализации.
+    [SerializeField]
+    private TMP_Dropdown _localizationDropdown;
+
+    // Переключатель полноэкранного режима.
+    [SerializeField]
+    private Toggle _fullScreenToggle;
+
+    // Переключатель записи логов в файл.
+    [SerializeField]
+    private Toggle _fileLoggingToggle;
+
+    // Ползунок громкости музыки.
+    [SerializeField]
+    private Slider _musicVolumeSlider;
+
+    // Ползунок громкости звуков.
+    [SerializeField]
+    private Slider _soundVolumeSlider;
+
+    // Текст значения громкости музыки.
+    [SerializeField]
+    private TMP_Text _musicVolumeText;
+
+    // Текст значения громкости звуков.
+    [SerializeField]
+    private TMP_Text _soundVolumeText;
+
+    // Источник музыки.
+    [SerializeField]
+    private AudioSource _musicSource;
+
+    // Источники игровых звуков.
+    [SerializeField]
+    private AudioSource[] _soundSources;
+
+    // Элементы интерфейса для локализации.
+    [SerializeField]
+    private List<Word> _words;
+
+    #endregion
+
+
+    #region Приватные классы
+
+    /// <summary>
+    /// Класс хранит элемент интерфейса и его ключ локализации.
     /// </summary>
     [Serializable]
     private class Word
     {
-        public string KeyWord;      // Ключевое слово
-        public TMP_Text WordText;    // Текстовое поле для отображения слова
+        // Ключ локализации.
+        public string KeyWord;
+
+        // Текстовый компонент интерфейса.
+        public TMP_Text WordText;
     }
 
-    // Структура для хранения разрешения экрана
+    /// <summary>
+    /// Структура хранит данные разрешения экрана.
+    /// </summary>
     private struct ScreenResolution
     {
-        public int Width; // Ширина разрешения
-        public int Height; // Высота разрешения
-        public string DisplayString => $"{Width}x{Height}"; // Строковое представление разрешения
+        // Ширина экрана.
+        public int Width;
 
+        // Высота экрана.
+        public int Height;
+
+        // Текстовое представление разрешения.
+        public string DisplayString => $"{Width}x{Height}";
+
+        /// <summary>
+        /// Структура создает объект разрешения экрана.
+        /// </summary>
+        /// <param name="width">Ширина экрана.</param>
+        /// <param name="height">Высота экрана.</param>
         public ScreenResolution(int width, int height)
         {
             Width = width;
@@ -55,12 +99,22 @@ public class SettingsMenuManager : MonoBehaviour
         }
     }
 
-    // Структура для хранения локализации игры
+    /// <summary>
+    /// Структура хранит данные локализации.
+    /// </summary>
     private struct Localization
     {
-        public string Language; // Язык локализации
-        public string LanguageCode; // Код языка локализации
+        // Название языка.
+        public string Language;
 
+        // Код языка.
+        public string LanguageCode;
+
+        /// <summary>
+        /// Структура создает объект локализации.
+        /// </summary>
+        /// <param name="language">Название языка.</param>
+        /// <param name="languageCode">Код языка.</param>
         public Localization(string language, string languageCode)
         {
             Language = language;
@@ -68,337 +122,757 @@ public class SettingsMenuManager : MonoBehaviour
         }
     }
 
-    // Массив доступных разрешений экрана формата 16:9
-    private readonly ScreenResolution[] _screenResolutions = new ScreenResolution[]
+    #endregion
+
+
+    #region Данные настроек
+
+    // Доступные разрешения экрана.
+    private readonly ScreenResolution[] _screenResolutions =
     {
-        new ScreenResolution(1920, 1080), // Full HD
-        new ScreenResolution(1600, 900),  // HD+
-        new ScreenResolution(1366, 768),  // HD+
-        new ScreenResolution(1280, 720),  // HD
-        new ScreenResolution(2560, 1440), // QHD
-        new ScreenResolution(3840, 2160), // 4K
-        new ScreenResolution(640, 360)    // SD
+        new ScreenResolution(1920, 1080),
+        new ScreenResolution(1600, 900),
+        new ScreenResolution(1366, 768),
+        new ScreenResolution(1280, 720),
+        new ScreenResolution(2560, 1440),
+        new ScreenResolution(3840, 2160),
+        new ScreenResolution(640, 360)
     };
 
-    // Массив доступных локализаций игры
-    private readonly Localization[] _localizations = new Localization[]
+    // Доступные локализации игры.
+    private readonly Localization[] _localizations =
     {
-        new Localization("English","EN"),
-        new Localization("Русский","RU")
+        new Localization("English", "EN"),
+        new Localization("Русский", "RU")
     };
+
+    #endregion
+
 
     #region Публичные методы
 
     /// <summary>
-    /// Метод для инициализации настроек
+    /// Метод инициализирует систему настроек.
     /// </summary>
     public void Init()
     {
-        LoadSettings(); // Загрузка настроек из файла
-        ApplySettings(); // Применение текущих настроек
-        LogInfo("Settings initialized successfully.");
+        try
+        {
+            // Загружаем сохраненные настройки.
+            LoadSettings();
+
+            // Применяем настройки к игре.
+            ApplySettings();
+
+            LogInfo("Settings system initialized.");
+        }
+        catch (Exception exception)
+        {
+            LogError($"Failed to initialize settings system: {exception.Message}");
+        }
     }
 
     /// <summary>
-    /// Обработчик нажатия кнопки для открытия меню настроек и загрузки текущих настроек из файла
+    /// Метод сохраняет текущие настройки.
     /// </summary>
-    public void OnOpenSettingsMenuButtonClick()
+    public void ApplySettingsButtonClick()
     {
-        LoadSettings(); // Загрузка настроек из файла
-        LoadScreeResolutionsToDropdown(); // Загрузка доступных разрешений экрана в выпадающий список
-        LoadlocalizationsToDropdown(); // Загрузка доступных локализаций в выпадающий список
-        UpdateFullScreenToggle(); // Обновление состояния чекбокса полноэкранного режим
-        UpdateMusicVolumeSlider(); // Обновление значения слайдера громкости музыки
-        UpdateSoundVolumeSlider(); // Обновление значения слайдера громкости звуков
-        UpdateFileLoggingToggle(); // Обновление состояния чекбокса записи логов в файл
-        ApplySettings(); // Применение текущих настроек
-        _settingsMenuObject.SetActive(true); // Отображение меню настроек
-        LogInfo("Settings menu opened.");
+        try
+        {
+            // Сохраняем настройки.
+            SaveSettings();
+
+            LogInfo("Settings saved.");
+        }
+        catch (Exception exception)
+        {
+            LogError($"Failed to save settings: {exception.Message}");
+        }
     }
 
     /// <summary>
-    /// Обработчик нажатия кнопки для применения текущих настроек и закрытия меню
+    /// Метод отменяет текущие изменения настроек.
     /// </summary>
-    public void OnApplySettingsButtonClick()
+    public void CancelSettingsButtonClick()
     {
-        SaveSettings(); // Сохранение настроек в файл
-        _settingsMenuObject.SetActive(false); // Закрытие меню настроек
-        LogInfo("Settings applied and menu closed.");
+        try
+        {
+            // Загружаем сохраненные настройки.
+            LoadSettings();
+
+            // Применяем сохраненные значения.
+            ApplySettings();
+
+            // Обновляем элементы интерфейса.
+            UpdateSettingsUI();
+
+            LogInfo("Settings changes canceled.");
+        }
+        catch (Exception exception)
+        {
+            LogError($"Failed to cancel settings changes: {exception.Message}");
+        }
     }
 
     /// <summary>
-    /// Обработчик нажатия кнопки для отмены текущих настроек и закрытия меню
+    /// Метод подготавливает интерфейс меню настроек.
     /// </summary>
-    public void OnCancelSettingsButtonClick()
+    public void PrepareSettingsMenu()
     {
-        LoadSettings(); // Загрузка настроек из файла
-        ApplySettings(); // Применение текущих настроек
-        _settingsMenuObject.SetActive(false); // Закрытие меню настроек
-        LogInfo("Settings canceled and menu closed.");
-    }
+        try
+        {
+            // Загружаем текущие настройки.
+            LoadSettings();
 
-    /// <summary>
-    /// Обработчик изменения состояния чекбокса для переключения состояния полноэкранного режима
-    /// </summary>
-    public void OnFullScreenToggleChanged()
-    {
-        Settings.IsFullScreen = _fullScreenToggle.isOn; // Сохраняем текущее состояние полноэкранного режима в настройках
-        Settings.ApplyFullScreen(); // Применяем состояние полноэкранного режима
-        LogInfo($"Full screen mode set to: {Settings.IsFullScreen}.");
-    }
+            // Обновляем значения элементов интерфейса.
+            UpdateSettingsUI();
 
-    /// <summary>
-    /// Обработчик изменения громкости музыки слайдером
-    /// </summary>
-    public void OnMusicVolumeSliderChanged()
-    {
-        Settings.MusicVolume = _musicVolumeSlider.value; // Сохраняем текущее значение громкости в настройках
-        Settings.ApplyMusicVolume(_musicSource); // Применяем выбранную громкость музыки
-        UpdateMusicVolumeText(); // Обновляем текстовое поле громкости
-        LogInfo($"Music volume set to: {Settings.MusicVolume}.");
-    }
-
-    /// <summary>
-    /// Обработчик изменения громкости звуков слайдером
-    /// </summary>
-    public void OnSoundVolumeSliderChanged()
-    {
-        Settings.SoundVolume = _soundVolumeSlider.value; // Сохраняем текущее значение громкости в настройках
-        if (_soundSource.Length > 0)
-            foreach (AudioSource sound in _soundSource)
-                Settings.ApplySoundVolume(sound); // Применяем выбранную громкость звуков
-        UpdateSoundVolumeText(); // Обновляем текстовое поле громкости
-        LogInfo($"Sound volume set to: {Settings.SoundVolume}.");
-    }
-
-    /// <summary>
-    /// Обработчик изменения состояния чекбокса для переключения состояния записи логов в файл
-    /// </summary>
-    public void OnFileLoggingToggleChanged()
-    {
-        Settings.IsFileLogging = _fileLoggingToggle.isOn; // Сохраняем текущее состояние записи логов в настройках
-        Settings.ApplyFileLogging(); // Применяем состояние записи логов
-        LogInfo($"File logging set to: {Settings.IsFileLogging}.");
+            LogInfo("Settings menu prepared.");
+        }
+        catch (Exception exception)
+        {
+            LogError($"Failed to prepare settings menu: {exception.Message}");
+        }
     }
 
     #endregion
 
-    #region Приватные методы
+
+    #region Обработчики интерфейса
 
     /// <summary>
-    /// Метод для загрузки настроек из файла
+    /// Обработчик изменяет состояние полноэкранного режима.
+    /// </summary>
+    public void OnFullScreenToggleChanged()
+    {
+        try
+        {
+            // Проверяем наличие переключателя.
+            if (_fullScreenToggle == null)
+            {
+                LogError("Fullscreen toggle is null.");
+                return;
+            }
+
+
+            // Сохраняем новое значение.
+            Settings.IsFullScreen = _fullScreenToggle.isOn;
+
+
+            // Применяем режим экрана.
+            Settings.ApplyFullScreen();
+
+
+            LogInfo($"Fullscreen mode changed: {Settings.IsFullScreen}.");
+        }
+        catch (Exception exception)
+        {
+            LogError($"Failed to change fullscreen mode: {exception.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Обработчик изменяет состояние записи логов в файл.
+    /// </summary>
+    public void OnFileLoggingToggleChanged()
+    {
+        try
+        {
+            // Проверяем наличие переключателя.
+            if (_fileLoggingToggle == null)
+            {
+                LogError("File logging toggle is null.");
+                return;
+            }
+
+            // Сохраняем новое значение.
+            Settings.IsFileLogging = _fileLoggingToggle.isOn;
+
+            // Применяем настройку логирования.
+            Settings.ApplyFileLogging();
+
+            LogInfo($"File logging changed: {Settings.IsFileLogging}.");
+        }
+        catch (Exception exception)
+        {
+            LogError($"Failed to change file logging: {exception.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Обработчик изменяет громкость музыки.
+    /// </summary>
+    public void OnMusicVolumeSliderChanged()
+    {
+        try
+        {
+            // Проверяем наличие слайдера.
+            if (_musicVolumeSlider == null)
+            {
+                LogError("Music volume slider is null.");
+                return;
+            }
+
+            // Сохраняем громкость.
+            Settings.MusicVolume = _musicVolumeSlider.value;
+
+            // Применяем громкость.
+            Settings.ApplyMusicVolume(_musicSource);
+
+            // Обновляем отображение значения.
+            UpdateMusicVolumeText();
+
+            LogInfo($"Music volume changed: {Settings.MusicVolume}%.");
+        }
+        catch (Exception exception)
+        {
+            LogError($"Failed to change music volume: {exception.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Обработчик изменяет громкость звуков.
+    /// </summary>
+    public void OnSoundVolumeSliderChanged()
+    {
+        try
+        {
+            // Проверяем наличие слайдера.
+            if (_soundVolumeSlider == null)
+            {
+                LogError("Sound volume slider is null.");
+                return;
+            }
+
+            // Сохраняем громкость.
+            Settings.SoundVolume = _soundVolumeSlider.value;
+
+            // Применяем громкость ко всем источникам.
+            ApplySoundVolumeToSources();
+
+            // Обновляем отображение значения.
+            UpdateSoundVolumeText();
+
+            LogInfo($"Sound volume changed: {Settings.SoundVolume}%.");
+        }
+        catch (Exception exception)
+        {
+            LogError($"Failed to change sound volume: {exception.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Обработчик изменяет разрешение экрана.
+    /// </summary>
+    /// <param name="index">Индекс выбранного разрешения.</param>
+    public void OnScreenResolutionChanged(int index)
+    {
+        try
+        {
+            // Проверяем индекс.
+            if (!ValidateResolutionIndex(index))
+            {
+                LogError("Invalid screen resolution index.");
+                return;
+            }
+
+            // Сохраняем разрешение.
+            Settings.ScreenResolution = _screenResolutions[index].DisplayString;
+
+            // Применяем разрешение.
+            Settings.ApplyScreenResolution();
+
+            LogInfo($"Screen resolution changed: {Settings.ScreenResolution}.");
+        }
+        catch (Exception exception)
+        {
+            LogError($"Failed to change screen resolution: {exception.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Обработчик изменяет локализацию игры.
+    /// </summary>
+    /// <param name="index">Индекс выбранной локализации.</param>
+    public void OnLocalizationChanged(int index)
+    {
+        try
+        {
+            // Проверяем индекс.
+            if (!ValidateLocalizationIndex(index))
+            {
+                LogError("Invalid localization index.");
+                return;
+            }
+
+            // Сохраняем язык.
+            Settings.Localization = _localizations[index].Language;
+
+            // Сохраняем код языка.
+            Settings.LanguageCode = _localizations[index].LanguageCode;
+
+            // Применяем локализацию.
+            ApplyLocalization();
+
+            LogInfo($"Localization changed: {Settings.Localization}.");
+        }
+        catch (Exception exception)
+        {
+            LogError($"Failed to change localization: {exception.Message}");
+        }
+    }
+
+    #endregion
+
+
+    #region Применение настроек
+
+    /// <summary>
+    /// Метод загружает настройки из файла.
     /// </summary>
     private void LoadSettings()
     {
-        Settings.Load(); // Загрузка настроек
-        LogInfo("Settings loaded successfully.");
+        // Загружаем настройки.
+        Settings.Load();
+
+        LogInfo("Settings loaded.");
     }
 
     /// <summary>
-    /// Метод для сохранения текущих настроек в файл
+    /// Метод сохраняет настройки в файл.
     /// </summary>
     private void SaveSettings()
     {
-        Settings.Save(); // Сохранение настроек
-        LogInfo("Settings saved to file.");
+        // Сохраняем настройки.
+        Settings.Save();
+
+        LogInfo("Settings saved.");
     }
 
     /// <summary>
-    /// Метод для применения текущих настроек
+    /// Метод применяет текущие настройки игры.
     /// </summary>
     private void ApplySettings()
     {
-        Settings.ApplyScreenResolution(); // Применение разрешения экрана из настроек
-        var words = new Dictionary<string, TMP_Text>();
-        foreach (var word in _words)
-            words.Add(word.KeyWord, word.WordText);
-        Settings.ApplyLocalization(words); // Применение локализации из настроек
-        Settings.ApplyFullScreen(); // Применение состояния полноэкранного режима
-        Settings.ApplyMusicVolume(_musicSource); // Применение громкости музыки
-        if (_soundSource.Length > 0)
-            foreach (AudioSource sound in _soundSource)
-                Settings.ApplySoundVolume(sound); // Применение громкости звуков
-        Settings.ApplyFileLogging(); // Применение состояния записи логов в файл
-        LogInfo("Settings applied successfully.");
+        try
+        {
+            // Применяем разрешение экрана.
+            Settings.ApplyScreenResolution();
+
+            // Применяем локализацию.
+            ApplyLocalization();
+
+            // Применяем полноэкранный режим.
+            Settings.ApplyFullScreen();
+
+            // Применяем громкость музыки.
+            Settings.ApplyMusicVolume(_musicSource);
+
+            // Применяем громкость звуков.
+            ApplySoundVolumeToSources();
+
+            // Применяем состояние логирования.
+            Settings.ApplyFileLogging();
+
+            LogInfo("Settings applied.");
+        }
+        catch (Exception exception)
+        {
+            LogError($"Failed to apply settings: {exception.Message}");
+        }
     }
 
     /// <summary>
-    /// Метод для загрузки доступных разрешений экрана в выпадающий список
+    /// Метод применяет локализацию элементов интерфейса.
     /// </summary>
-    private void LoadScreeResolutionsToDropdown()
+    private void ApplyLocalization()
     {
-        _screenResolutionDropdown.ClearOptions(); // Очистка текущих опций
+        // Получаем словарь элементов интерфейса.
+        Dictionary<string, TMP_Text> words = CreateLocalizationDictionary();
 
-        List<string> options = new List<string>();
-        foreach (var res in _screenResolutions)
+        // Применяем локализацию.
+        Settings.ApplyLocalization(words);
+    }
+
+    /// <summary>
+    /// Метод создает словарь элементов интерфейса.
+    /// </summary>
+    /// <returns>Словарь ключей и текстовых компонентов.</returns>
+    private Dictionary<string, TMP_Text> CreateLocalizationDictionary()
+    {
+        // Создаем новый словарь.
+        Dictionary<string, TMP_Text> words = new Dictionary<string, TMP_Text>();
+
+        // Проверяем наличие списка элементов.
+        if (_words == null)
         {
-            options.Add(res.DisplayString); // Добавление нового разрешения экрана
+            LogWarning("Localization words list is null.");
+
+            return words;
         }
-        _screenResolutionDropdown.AddOptions(options); // Добавление новых опций
 
-        int currentIndex = GetScreeResolutionIndex(Settings.ScreenResolution); // Получаем текущий индекс разрешения экрана
-        _screenResolutionDropdown.value = currentIndex; // Устанавливаем выбранное значение
-        _screenResolutionDropdown.RefreshShownValue(); // Обновление отображаемого значения
+        // Добавляем элементы в словарь.
+        foreach (Word word in _words)
+        {
+            // Проверяем корректность элемента.
+            if (word == null || word.WordText == null)
+            {
+                LogWarning("Invalid localization element skipped.");
 
-        // Удаление предыдущих обработчиков событий и добавление нового
+                continue;
+            }
+
+            // Добавляем перевод.
+            words[word.KeyWord] = word.WordText;
+        }
+
+        return words;
+    }
+
+    #endregion
+
+
+    #region Обновление интерфейса
+
+    /// <summary>
+    /// Метод обновляет все элементы меню настроек.
+    /// </summary>
+    private void UpdateSettingsUI()
+    {
+        // Обновляем разрешение экрана.
+        UpdateScreenResolutionDropdown();
+
+        // Обновляем локализацию.
+        UpdateLocalizationDropdown();
+
+        // Обновляем полноэкранный режим.
+        UpdateFullScreenToggle();
+
+        // Обновляем логирование.
+        UpdateFileLoggingToggle();
+
+        // Обновляем громкость музыки.
+        UpdateMusicVolumeSlider();
+
+        // Обновляем громкость звуков.
+        UpdateSoundVolumeSlider();
+    }
+
+    /// <summary>
+    /// Метод загружает разрешения экрана в список.
+    /// </summary>
+    private void UpdateScreenResolutionDropdown()
+    {
+        // Проверяем наличие элемента.
+        if (_screenResolutionDropdown == null)
+        {
+            LogError("Screen resolution dropdown is null.");
+
+            return;
+        }
+
+        // Очищаем старые значения.
+        _screenResolutionDropdown.ClearOptions();
+
+        // Создаем список разрешений.
+        List<string> options = new List<string>();
+
+        // Добавляем доступные разрешения.
+        foreach (ScreenResolution resolution in _screenResolutions)
+        {
+            options.Add(resolution.DisplayString);
+        }
+
+        // Заполняем список.
+        _screenResolutionDropdown.AddOptions(options);
+
+        // Устанавливаем текущее значение.
+        _screenResolutionDropdown.value = GetScreenResolutionIndex();
+
+        // Обновляем отображение.
+        _screenResolutionDropdown.RefreshShownValue();
+
+        // Настраиваем обработчик.
         _screenResolutionDropdown.onValueChanged.RemoveAllListeners();
-        _screenResolutionDropdown.onValueChanged.AddListener(OnChangeScreenResolution);
+
+        _screenResolutionDropdown.onValueChanged.AddListener(OnScreenResolutionChanged);
     }
 
     /// <summary>
-    /// Метод для загрузки доступных локализаций в выпадающий список
+    /// Метод загружает локализации в список.
     /// </summary>
-    private void LoadlocalizationsToDropdown()
+    private void UpdateLocalizationDropdown()
     {
-        _localizationDropdown.ClearOptions(); // Очистка текущих опций
+        // Проверяем наличие элемента.
+        if (_localizationDropdown == null)
+        {
+            LogError("Localization dropdown is null.");
 
+            return;
+        }
+
+        // Очищаем старые значения.
+        _localizationDropdown.ClearOptions();
+
+        // Создаем список языков.
         List<string> options = new List<string>();
-        foreach (var localization in _localizations)
+
+        // Добавляем доступные языки.
+        foreach (Localization localization in _localizations)
         {
-            options.Add(localization.Language); // Добавление новой локализации
+            options.Add(localization.Language);
         }
-        _localizationDropdown.AddOptions(options); // Добавление новых опций
 
-        int currentIndex = GetLocalizationIndex(Settings.Localization); // Получаем текущий индекс рлокализации
-        _localizationDropdown.value = currentIndex; // Устанавливаем выбранное значение
-        _localizationDropdown.RefreshShownValue(); // Обновление отображаемого значения
+        // Заполняем список.
+        _localizationDropdown.AddOptions(options);
 
-        // Удаление предыдущих обработчиков событий и добавление нового
+        // Устанавливаем текущий язык.
+        _localizationDropdown.value = GetLocalizationIndex();
+
+        // Обновляем отображение.
+        _localizationDropdown.RefreshShownValue();
+
+        // Настраиваем обработчик.
         _localizationDropdown.onValueChanged.RemoveAllListeners();
-        _localizationDropdown.onValueChanged.AddListener(OnChangeLocalization);
+
+        _localizationDropdown.onValueChanged.AddListener(OnLocalizationChanged);
     }
 
     /// <summary>
-    /// Обработчик изменения разрешения экрана из выпадающего списка
-    /// </summary>
-    /// <param name="index">Индекс выбранного разрешения экрана</param>
-    private void OnChangeScreenResolution(int index)
-    {
-        Settings.ScreenResolution = _screenResolutions[index].DisplayString; // Сохраняем текущее разрешение экрана в настройках
-        Settings.ApplyScreenResolution(); // Применяем выбранное разрешение экрана
-        LogInfo($"Screen resolution changed to: {Settings.ScreenResolution}.");
-    }
-
-    /// <summary>
-    /// Обработчик изменения локализации из выпадающего списка
-    /// </summary>
-    /// <param name="index">Индекс выбранной локализации</param>
-    private void OnChangeLocalization(int index)
-    {
-        Settings.Localization = _localizations[index].Language; // Сохраняем текущую локализацию в настройках
-        Settings.LanguageCode = _localizations[index].LanguageCode; // Сохраняем текущий код языка в настройках
-        var words = new Dictionary<string, TMP_Text>();
-        foreach (var word in _words)
-            words.Add(word.KeyWord, word.WordText);
-        Settings.ApplyLocalization(words); // Применяем выбранную локализацию
-        LogInfo($"Localization changed to: {Settings.Localization}.");
-    }
-
-    /// <summary>
-    /// Метод для получения индекса указанного разрешения экрана в списке доступных разрешений
-    /// </summary>
-    /// <param name="resolution">Строка указанного разрешения экрана</param>
-    /// <returns>Индекс указанного разрешения экрана</returns>
-    private int GetScreeResolutionIndex(string resolution)
-    {
-        for (int i = 0; i < _screenResolutions.Length; i++)
-        {
-            if (_screenResolutions[i].DisplayString == resolution)
-                return i; // Возвращаем индекс, если совпадение найдено
-        }
-        return 0; // По умолчанию первый индекс
-    }
-
-    /// <summary>
-    /// Метод для получения индекса указанной локализации в списке доступных локализаций
-    /// </summary>
-    /// <param name="localization">Строка указанной локализации</param>
-    /// <returns>Индекс указанной локализации</returns>
-    private int GetLocalizationIndex(string localization)
-    {
-        for (int i = 0; i < _localizations.Length; i++)
-        {
-            if (_localizations[i].Language == localization)
-                return i; // Возвращаем индекс, если совпадение найдено
-        }
-        return 0; // По умолчанию первый индекс
-    }
-
-    /// <summary>
-    /// Метод для обновления состояния чекбокса полноэкранного режима
+    /// Метод обновляет состояние полноэкранного режима.
     /// </summary>
     private void UpdateFullScreenToggle()
     {
-        _fullScreenToggle.isOn = Settings.IsFullScreen; // Установка состояния чекбокса
+        // Проверяем наличие элемента.
+        if (_fullScreenToggle == null)
+        {
+            LogError("Fullscreen toggle is null.");
+
+            return;
+        }
+
+        // Устанавливаем состояние переключателя.
+        _fullScreenToggle.isOn = Settings.IsFullScreen;
     }
 
     /// <summary>
-    /// Метод для обновления текущего значения слайдера громкости музыки
-    /// </summary>
-    private void UpdateMusicVolumeSlider()
-    {
-        _musicVolumeSlider.value = Settings.MusicVolume; // Установка значения слайдера громкости музыки
-        UpdateMusicVolumeText(); // Обновление текста с громкостью
-    }
-
-    /// <summary>
-    /// Метод для обновления текущего значения слайдера громкости звуков
-    /// </summary>
-    private void UpdateSoundVolumeSlider()
-    {
-        _soundVolumeSlider.value = Settings.SoundVolume; // Установка значения слайдера громкости звуков
-        UpdateSoundVolumeText(); // Обновление текста с громкостью
-    }
-
-    /// <summary>
-    /// Метод для обновления текстового поля с текущей громкостью музыки
-    /// </summary>
-    private void UpdateMusicVolumeText()
-    {
-        _musicVolumeText.text = $"{Settings.MusicVolume.ToString("F0")}"; // Обновляем текст, показывая громкость в процентах
-    }
-
-    /// <summary>
-    /// Метод для обновления текстового поля с текущей громкостью звуков
-    /// </summary>
-    private void UpdateSoundVolumeText()
-    {
-        _soundVolumeText.text = $"{Settings.SoundVolume.ToString("F0")}"; // Обновляем текст, показывая громкость в процентах
-    }
-
-    /// <summary>
-    /// Метод для обновления состояния чекбокса записи логов в файл
+    /// Метод обновляет состояние записи логов.
     /// </summary>
     private void UpdateFileLoggingToggle()
     {
-        _fileLoggingToggle.isOn = Settings.IsFileLogging; // Установка состояния чекбокса
+        // Проверяем наличие элемента.
+        if (_fileLoggingToggle == null)
+        {
+            LogError("File logging toggle is null.");
+
+            return;
+        }
+
+        // Устанавливаем состояние переключателя.
+        _fileLoggingToggle.isOn = Settings.IsFileLogging;
     }
 
     /// <summary>
-    /// Метод для логирования ошибок
+    /// Метод обновляет значение громкости музыки.
     /// </summary>
-    /// <param name="message">Сообщение для логирования</param>
-    private void LogError(string message)
+    private void UpdateMusicVolumeSlider()
     {
-        Logger.Log(Logger.LogLevel.Error, nameof(SettingsMenuManager), message);
+        // Проверяем наличие элемента.
+        if (_musicVolumeSlider == null)
+        {
+            LogError("Music volume slider is null.");
+
+            return;
+        }
+
+        // Устанавливаем значение громкости.
+        _musicVolumeSlider.value = Settings.MusicVolume;
+
+        // Обновляем текст.
+        UpdateMusicVolumeText();
     }
 
     /// <summary>
-    /// Метод для логирования предупреждений
+    /// Метод обновляет значение громкости звуков.
     /// </summary>
-    /// <param name="message">Сообщение для логирования</param>
+    private void UpdateSoundVolumeSlider()
+    {
+        // Проверяем наличие элемента.
+        if (_soundVolumeSlider == null)
+        {
+            LogError("Sound volume slider is null.");
+
+            return;
+        }
+
+        // Устанавливаем значение громкости.
+        _soundVolumeSlider.value = Settings.SoundVolume;
+
+        // Обновляем текст.
+        UpdateSoundVolumeText();
+    }
+
+    /// <summary>
+    /// Метод обновляет текст громкости музыки.
+    /// </summary>
+    private void UpdateMusicVolumeText()
+    {
+        // Проверяем наличие текста.
+        if (_musicVolumeText == null)
+        {
+            LogError("Music volume text is null.");
+
+            return;
+        }
+
+        // Отображаем значение громкости.
+        _musicVolumeText.text = Settings.MusicVolume.ToString("F0");
+    }
+
+    /// <summary>
+    /// Метод обновляет текст громкости звуков.
+    /// </summary>
+    private void UpdateSoundVolumeText()
+    {
+        // Проверяем наличие текста.
+        if (_soundVolumeText == null)
+        {
+            LogError("Sound volume text is null.");
+
+            return;
+        }
+
+        // Отображаем значение громкости.
+        _soundVolumeText.text = Settings.SoundVolume.ToString("F0");
+    }
+
+    #endregion
+
+
+    #region Работа со звуком
+
+    /// <summary>
+    /// Метод применяет громкость ко всем источникам звуков.
+    /// </summary>
+    private void ApplySoundVolumeToSources()
+    {
+        // Проверяем наличие источников.
+        if (_soundSources == null || _soundSources.Length == 0)
+        {
+            LogWarning("Sound sources collection is empty.");
+
+            return;
+        }
+
+        // Применяем громкость каждому источнику.
+        foreach (AudioSource source in _soundSources)
+        {
+            Settings.ApplySoundVolume(source);
+        }
+    }
+
+    #endregion
+
+
+    #region Получение индексов
+
+    /// <summary>
+    /// Метод получает индекс текущего разрешения экрана.
+    /// </summary>
+    /// <returns>Индекс разрешения.</returns>
+    private int GetScreenResolutionIndex()
+    {
+        // Ищем совпадение разрешения.
+        for (int index = 0; index < _screenResolutions.Length; index++)
+        {
+            if (_screenResolutions[index].DisplayString == Settings.ScreenResolution)
+            {
+                return index;
+            }
+        }
+
+        // Возвращаем первое значение по умолчанию.
+        return 0;
+    }
+
+    /// <summary>
+    /// Метод получает индекс текущей локализации.
+    /// </summary>
+    /// <returns>Индекс локализации.</returns>
+    private int GetLocalizationIndex()
+    {
+        // Ищем совпадение языка.
+        for (int index = 0; index < _localizations.Length; index++)
+        {
+            if (_localizations[index].Language == Settings.Localization)
+            {
+                return index;
+            }
+        }
+
+        // Возвращаем первое значение по умолчанию.
+        return 0;
+    }
+
+    #endregion
+
+
+    #region Проверки
+
+    /// <summary>
+    /// Метод проверяет индекс разрешения.
+    /// </summary>
+    /// <param name="index">Проверяемый индекс.</param>
+    /// <returns>True, если индекс корректный.</returns>
+    private bool ValidateResolutionIndex(int index)
+    {
+        // Проверяем границы массива.
+        return index >= 0 &&
+               index < _screenResolutions.Length;
+    }
+
+    /// <summary>
+    /// Метод проверяет индекс локализации.
+    /// </summary>
+    /// <param name="index">Проверяемый индекс.</param>
+    /// <returns>True, если индекс корректный.</returns>
+    private bool ValidateLocalizationIndex(int index)
+    {
+        // Проверяем границы массива.
+        return index >= 0 &&
+               index < _localizations.Length;
+    }
+
+    #endregion
+
+
+    #region Логирование
+
+    /// <summary>
+    /// Метод записывает информационное сообщение.
+    /// </summary>
+    /// <param name="message">Сообщение для записи.</param>
+    private void LogInfo(string message)
+    {
+        Logger.Log(Logger.LogLevel.Info, nameof(SettingsMenuManager), message);
+    }
+
+    /// <summary>
+    /// Метод записывает предупреждение.
+    /// </summary>
+    /// <param name="message">Сообщение предупреждения.</param>
     private void LogWarning(string message)
     {
         Logger.Log(Logger.LogLevel.Warning, nameof(SettingsMenuManager), message);
     }
 
     /// <summary>
-    /// Метод для логирования информационных сообщений
+    /// Метод записывает ошибку.
     /// </summary>
-    /// <param name="message">Сообщение для логирования</param>
-    private void LogInfo(string message)
+    /// <param name="message">Сообщение ошибки.</param>
+    private void LogError(string message)
     {
-        Logger.Log(Logger.LogLevel.Info, nameof(SettingsMenuManager), message);
+        Logger.Log(Logger.LogLevel.Error, nameof(SettingsMenuManager), message);
     }
 
     #endregion

@@ -5,321 +5,683 @@ using System.Text.RegularExpressions;
 using TMPro;
 using UnityEngine;
 
+/// <summary>
+/// Класс управляет настройками игры.
+/// </summary>
 public static class Settings
 {
-    // Путь к файлу настроек
-    private static readonly string _settingsFilePath = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-        "Valley of Elves",
-        "settings.json"
-    );
-
-    // Регулярное выражение для проверки формата разрешения экрана
-    private static readonly Regex _resolutionRegex = new Regex(@"^(\d+)x(\d+)$", RegexOptions.Compiled);
+    #region Приватные классы
 
     /// <summary>
-    /// Класс для хранения данных настроек
+    /// Класс хранит константы настроек.
+    /// </summary>
+    private static class Constants
+    {
+        // Название папки игры для хранения данных.
+        public const string GameFolderName = "Valley of Elves";
+
+        // Название файла настроек.
+        public const string SettingsFileName = "settings.json";
+
+        // Минимальное значение громкости.
+        public const float MinVolume = 0f;
+
+        // Максимальное значение громкости.
+        public const float MaxVolume = 100f;
+
+        // Формат проверки разрешения экрана.
+        public const string ResolutionPattern = @"^(\d+)x(\d+)$";
+    }
+
+    /// <summary>
+    /// Класс хранит значения настроек по умолчанию.
+    /// </summary>
+    private static class DefaultSettings
+    {
+        // Разрешение экрана по умолчанию.
+        public const string ScreenResolution = "1920x1080";
+
+        // Локализация по умолчанию.
+        public const string Localization = "English";
+
+        // Код языка по умолчанию.
+        public const string LanguageCode = "EN";
+
+        // Полноэкранный режим по умолчанию.
+        public const bool IsFullScreen = true;
+
+        // Громкость музыки по умолчанию.
+        public const float MusicVolume = 100f;
+
+        // Громкость звуков по умолчанию.
+        public const float SoundVolume = 100f;
+
+        // Запись логов в файл по умолчанию.
+        public const bool IsFileLogging = true;
+    }
+
+    /// <summary>
+    /// Класс хранит данные настроек для сериализации.
     /// </summary>
     [Serializable]
     private class SettingsData
     {
-        public string ScreenResolution = "1920x1080";   // Разрешение экрана, по умолчанию 1920x1080
-        public string Localization = "English";         // Локализация игры, по умолчанию English
-        public string LanguageCode = "EN";              // Код языка, по умолчанию EN
-        public bool IsFullScreen = true;                // Значение состояния полноэкранного режима, по умолчанию включен
-        public float MusicVolume = 100f;                // Громкость музыки от 0 до 100, по умолчанию 100
-        public float SoundVolume = 100f;                // Громкость звуков от 0 до 100, по умолчанию 100
-        public bool IsFileLogging = true;               // Значение состояния записи логов в файл, по умолчанию включен
+        // Разрешение экрана.
+        public string ScreenResolution = DefaultSettings.ScreenResolution;
+
+        // Название локализации.
+        public string Localization = DefaultSettings.Localization;
+
+        // Код языка.
+        public string LanguageCode = DefaultSettings.LanguageCode;
+
+        // Состояние полноэкранного режима.
+        public bool IsFullScreen = DefaultSettings.IsFullScreen;
+
+        // Громкость музыки.
+        public float MusicVolume = DefaultSettings.MusicVolume;
+
+        // Громкость звуков.
+        public float SoundVolume = DefaultSettings.SoundVolume;
+
+        // Состояние записи логов в файл.
+        public bool IsFileLogging = DefaultSettings.IsFileLogging;
     }
 
-    // Объект для хранения текущих значений настроек
-    private static SettingsData _currentSettings = new SettingsData();
+    #endregion
 
-    // Свойство для получения и установки разрешения экрана
+
+    #region Приватные поля
+
+    // Путь к файлу настроек.
+    private static readonly string _settingsFilePath = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+        Constants.GameFolderName,
+        Constants.SettingsFileName
+    );
+
+    // Регулярное выражение для проверки разрешения экрана.
+    private static readonly Regex _resolutionRegex = new Regex(
+        Constants.ResolutionPattern,
+        RegexOptions.Compiled
+    );
+
+    // Текущие настройки игры.
+    private static SettingsData _currentSettings = CreateDefaultSettings();
+
+    #endregion
+
+
+    #region Публичные свойства
+
+    /// <summary>
+    /// Свойство получает или устанавливает разрешение экрана.
+    /// </summary>
     public static string ScreenResolution
     {
         get => _currentSettings.ScreenResolution;
+
         set
         {
-            if (IsValidResolution(value))
+            if (!ValidateResolution(value))
             {
-                _currentSettings.ScreenResolution = value;
+                LogError("Invalid screen resolution format.");
+                return;
             }
-            else
-            {
-                LogError("Invalid screen resolution format! Expected format 'width x height'!");
-            }
+
+            _currentSettings.ScreenResolution = value;
         }
     }
 
-    // Свойство для получения и установки локализации игры
+    /// <summary>
+    /// Свойство получает или устанавливает название локализации.
+    /// </summary>
     public static string Localization
     {
         get => _currentSettings.Localization;
+
         set
         {
-            if (!string.IsNullOrWhiteSpace(value))
+            if (!ValidateString(value))
             {
-                _currentSettings.Localization = value;
+                LogError("Localization cannot be null or empty.");
+                return;
             }
-            else
-            {
-                LogError("Localization cannot be null or empty!");
-            }
+
+            _currentSettings.Localization = value;
         }
     }
 
-    // Свойство для получения и установки кода языка
+    /// <summary>
+    /// Свойство получает или устанавливает код языка.
+    /// </summary>
     public static string LanguageCode
     {
         get => _currentSettings.LanguageCode;
+
         set
         {
-            if (!string.IsNullOrWhiteSpace(value))
+            if (!ValidateString(value))
             {
-                _currentSettings.LanguageCode = value;
+                LogError("Language code cannot be null or empty.");
+                return;
             }
-            else
-            {
-                LogError("Language code cannot be null or empty!");
-            }
+
+            _currentSettings.LanguageCode = value;
         }
     }
 
-    // Свойство для доступа к состоянию полноэкранного режима
+    /// <summary>
+    /// Свойство получает или устанавливает состояние полноэкранного режима.
+    /// </summary>
     public static bool IsFullScreen
     {
         get => _currentSettings.IsFullScreen;
+
         set => _currentSettings.IsFullScreen = value;
     }
 
-    // Свойство для получения и установки громкости музыки (от 0 до 100)
+    /// <summary>
+    /// Свойство получает или устанавливает громкость музыки.
+    /// </summary>
     public static float MusicVolume
     {
         get => _currentSettings.MusicVolume;
-        set => _currentSettings.MusicVolume = Mathf.Clamp(value, 0, 100);
+
+        set => _currentSettings.MusicVolume = Mathf.Clamp(value, Constants.MinVolume, Constants.MaxVolume);
     }
 
-    // Свойство для получения и установки громкости звуков (от 0 до 100)
+    /// <summary>
+    /// Свойство получает или устанавливает громкость звуков.
+    /// </summary>
     public static float SoundVolume
     {
         get => _currentSettings.SoundVolume;
-        set => _currentSettings.SoundVolume = Mathf.Clamp(value, 0, 100);
+
+        set => _currentSettings.SoundVolume = Mathf.Clamp(value, Constants.MinVolume, Constants.MaxVolume);
     }
 
-    // Свойство для доступа к состоянию записи логов в файл
+    /// <summary>
+    /// Свойство получает или устанавливает состояние записи логов в файл.
+    /// </summary>
     public static bool IsFileLogging
     {
         get => _currentSettings.IsFileLogging;
+
         set => _currentSettings.IsFileLogging = value;
     }
 
-    /// <summary>
-    /// Метод для проверки формата разрешения экрана
-    /// </summary>
-    /// <param name="resolution">Строка разрешения экрана</param>
-    /// <returns>True, если формат разрешения корректен; иначе false.</returns>
-    private static bool IsValidResolution(string resolution)
-    {
-        return !string.IsNullOrWhiteSpace(resolution) && _resolutionRegex.IsMatch(resolution);
-    }
+    #endregion
+
+
+    #region Публичные методы
 
     /// <summary>
-    /// Метод для сохранения текущих настроек в файл JSON
+    /// Метод сохраняет текущие настройки в файл.
     /// </summary>
     public static void Save()
     {
         try
         {
-            // Создание директории, если она не существует
-            Directory.CreateDirectory(Path.GetDirectoryName(_settingsFilePath));
-            // Сериализация объекта настроек в строку JSON
-            string json = JsonUtility.ToJson(_currentSettings);
-            // Запись JSON-строки в файл настроек
+            // Проверяем корректность текущих настроек.
+            ValidateSettings();
+
+            // Создаем директорию настроек.
+            CreateSettingsDirectory();
+
+            // Преобразуем настройки в JSON.
+            string json = JsonUtility.ToJson(_currentSettings, true);
+
+            // Сохраняем JSON в файл.
             File.WriteAllText(_settingsFilePath, json);
+
             LogInfo("Settings saved successfully.");
         }
-        catch (Exception ex)
+        catch (Exception exception)
         {
-            LogError($"Failed to save settings: {ex.Message}!");
+            LogError($"Failed to save settings: {exception.Message}");
         }
     }
 
     /// <summary>
-    /// Метод для загрузки настроек из файла JSON
+    /// Метод загружает настройки из файла.
     /// </summary>
     public static void Load()
     {
         try
         {
-            if (File.Exists(_settingsFilePath))
+            // Проверяем наличие файла настроек.
+            if (!File.Exists(_settingsFilePath))
             {
-                // Чтение содержимого файла настроек в формате JSON
-                string json = File.ReadAllText(_settingsFilePath);
-                // Десериализация строки JSON в объект настроек
-                _currentSettings = JsonUtility.FromJson<SettingsData>(json) ?? new SettingsData();
-                LogInfo("Settings loaded successfully.");
-            }
-            else
-            {
-                // Установка значений по умолчанию и создание файла, если он отсутствует
                 SetDefaultSettings();
                 Save();
-                LogWarning("Settings file not found. Created a new one with default values!");
+
+                LogWarning("Settings file not found. Default settings created.");
+                return;
             }
+
+            // Читаем содержимое файла.
+            string json = File.ReadAllText(_settingsFilePath);
+
+            // Проверяем пустой файл.
+            if (string.IsNullOrWhiteSpace(json))
+            {
+                SetDefaultSettings();
+                Save();
+
+                LogWarning("Settings file is empty. Default settings restored.");
+                return;
+            }
+
+            // Загружаем настройки из JSON.
+            SettingsData loadedSettings = JsonUtility.FromJson<SettingsData>(json);
+
+            // Проверяем результат загрузки.
+            if (loadedSettings == null)
+            {
+                SetDefaultSettings();
+                Save();
+
+                LogWarning("Settings data is invalid. Default settings restored.");
+                return;
+            }
+
+            // Применяем загружанные настройки.
+            _currentSettings = loadedSettings;
+
+            // Проверяем корректность значений.
+            ValidateSettings();
+
+            LogInfo("Settings loaded successfully.");
         }
-        catch (Exception ex)
+        catch (Exception exception)
         {
-            LogError($"Failed to load settings: {ex.Message}!");
+            SetDefaultSettings();
+
+            LogError($"Failed to load settings: {exception.Message}");
         }
     }
 
     /// <summary>
-    /// Метод для установки настроек по умолчанию
+    /// Метод устанавливает настройки по умолчанию.
     /// </summary>
     public static void SetDefaultSettings()
     {
-        // Создание нового экземпляра настроек со значениями по умолчанию
-        _currentSettings = new SettingsData();
+        // Создаем новый объект настроек.
+        _currentSettings = CreateDefaultSettings();
+
         LogInfo("Default settings applied.");
     }
 
     /// <summary>
-    /// Метод для применения разрешения экрана
+    /// Метод применяет разрешение экрана.
     /// </summary>
     public static void ApplyScreenResolution()
     {
-        string[] dimensions = ScreenResolution.Split('x'); // Разделяем строку на ширину и высоту
-        int width = int.Parse(dimensions[0]); // Преобразуем ширину в целое число
-        int height = int.Parse(dimensions[1]); // Преобразуем высоту в целое число
-        Screen.SetResolution(width, height, Screen.fullScreen); // Устанавливаем новое разрешение экрана
-        LogInfo($"Screen resolution set to: {width}x{height}.");
+        try
+        {
+            // Разделяем разрешение на ширину и высоту.
+            string[] dimensions = ScreenResolution.Split('x');
+
+            // Получаем ширину экрана.
+            int width = int.Parse(dimensions[0]);
+
+            // Получаем высоту экрана.
+            int height = int.Parse(dimensions[1]);
+
+            // Устанавливаем разрешение.
+            Screen.SetResolution(width, height, Screen.fullScreen);
+
+            LogInfo($"Screen resolution applied: {ScreenResolution}.");
+        }
+        catch (Exception exception)
+        {
+            LogError($"Failed to apply screen resolution: {exception.Message}");
+        }
     }
 
     /// <summary>
-    /// Метод для применения локализации игры
+    /// Метод применяет выбранную локализацию.
     /// </summary>
-    /// <param name="words">Текстовые поля для отображения слов в игре</param>
+    /// <param name="words">Словарь элементов интерфейса и их ключей.</param>
     public static void ApplyLocalization(Dictionary<string, TMP_Text> words)
     {
-        // Загружаем локализацию из файла для текущего языка
-        Translator.LoadLocalization(LanguageCode);
-
-        // Заполняем текстовые поля переведенными словами
-        foreach (var word in words)
+        try
         {
-            string keyWord = word.Key;
-            TMP_Text wordText = word.Value;
+            // Проверяем наличие элементов интерфейса.
+            if (words == null || words.Count == 0)
+            {
+                LogWarning("Localization words collection is empty.");
+                return;
+            }
 
-            // Получаем перевод слова
-            string translated = Translator.Translation(keyWord);
-            wordText.text = translated;
+            // Загружаем файл локализации.
+            Translator.LoadLocalization(LanguageCode);
+
+            // Обновляем текстовые элементы.
+            foreach (KeyValuePair<string, TMP_Text> word in words)
+            {
+                // Получаем ключ перевода.
+                string key = word.Key;
+
+                // Получаем текстовый компонент.
+                TMP_Text text = word.Value;
+
+                // Проверяем наличие компонента.
+                if (text == null)
+                {
+                    LogWarning($"Text component for key '{key}' is null.");
+                    continue;
+                }
+
+                // Устанавливаем перевод.
+                text.text = Translator.Translation(key);
+            }
+
+            LogInfo($"Localization applied: {Localization}.");
         }
-
-        LogInfo($"Localization set to: {Localization} ({LanguageCode}).");
+        catch (Exception exception)
+        {
+            LogError($"Failed to apply localization: {exception.Message}");
+        }
     }
 
     /// <summary>
-    /// Метод для применения состояния полноэкранного режима
+    /// Метод применяет состояние полноэкранного режима.
     /// </summary>
     public static void ApplyFullScreen()
     {
-        Screen.fullScreen = IsFullScreen; // Устанавливаем полноэкранный режим
-        LogInfo($"Full screen mode applied: {IsFullScreen}.");
+        try
+        {
+            // Устанавливаем состояние окна.
+            Screen.fullScreen = IsFullScreen;
+
+            LogInfo($"Fullscreen mode applied: {IsFullScreen}.");
+        }
+        catch (Exception exception)
+        {
+            LogError($"Failed to apply fullscreen mode: {exception.Message}");
+        }
     }
 
     /// <summary>
-    /// Метод для применения громкости музыки
+    /// Метод применяет громкость музыки.
     /// </summary>
-    /// <param name="musicSource">Источник звука для музыки</param>
+    /// <param name="musicSource">Источник воспроизведения музыки.</param>
     public static void ApplyMusicVolume(AudioSource musicSource)
     {
-        if (musicSource == null)
+        try
         {
-            LogWarning("AudioSource for music is null. Cannot apply music volume!");
-            return;
-        }
+            // Проверяем наличие источника музыки.
+            if (musicSource == null)
+            {
+                LogWarning("Music AudioSource is null.");
+                return;
+            }
 
-        float volume = GetNormalizedMusicVolume();
-        musicSource.volume = volume; // Устанавливаем громкость музыки
-        LogInfo($"Music volume applied: {MusicVolume} ({volume * 100}%).");
+            // Получаем нормализованное значение громкости.
+            float volume = GetNormalizedMusicVolume();
+
+            // Применяем громкость к источнику.
+            musicSource.volume = volume;
+
+            LogInfo($"Music volume applied: {MusicVolume}%.");
+        }
+        catch (Exception exception)
+        {
+            LogError($"Failed to apply music volume: {exception.Message}");
+        }
     }
 
-    // <summary>
-    /// Метод для применения громкости звуков
+    /// <summary>
+    /// Метод применяет громкость звуков.
     /// </summary>
-    /// <param name="soundSource">Источник звука для звуков</param>
+    /// <param name="soundSource">Источник воспроизведения звука.</param>
     public static void ApplySoundVolume(AudioSource soundSource)
     {
-        if (soundSource == null)
+        try
         {
-            LogWarning("AudioSource for sound is null. Cannot apply sound volume!");
-            return;
+            // Проверяем наличие источника звука.
+            if (soundSource == null)
+            {
+                LogWarning("Sound AudioSource is null.");
+                return;
+            }
+
+            // Получаем нормализованное значение громкости.
+            float volume = GetNormalizedSoundVolume();
+
+            // Применяем громкость к источнику.
+            soundSource.volume = volume;
+
+            LogInfo($"Sound volume applied: {SoundVolume}%.");
         }
-
-        float volume = GetNormalizedSoundVolume();
-        soundSource.volume = volume; // Устанавливаем громкость звуков
-        LogInfo($"Sound volume applied: {SoundVolume} ({volume * 100}%).");
+        catch (Exception exception)
+        {
+            LogError($"Failed to apply sound volume: {exception.Message}");
+        }
     }
 
     /// <summary>
-    /// Метод для получения нормализованного значение громкости музыки (0 - 1)
-    /// </summary>
-    /// <returns>Нормализованная громкость музыки</returns>
-    private static float GetNormalizedMusicVolume()
-    {
-        return Mathf.Clamp(MusicVolume / 100f, 0f, 1f); // Ограничиваем значение от 0 до 1
-    }
-
-    /// <summary>
-    /// Метод для получения нормализованного значение громкости звуков (0 - 1)
-    /// </summary>
-    /// <returns>Нормализованная громкость звуков</returns>
-    private static float GetNormalizedSoundVolume()
-    {
-        return Mathf.Clamp(SoundVolume / 100f, 0f, 1f); // Ограничиваем значение от 0 до 1
-    }
-
-    /// <summary>
-    /// Метод для применения состояния записи логов в файл
+    /// Метод применяет состояние записи логов в файл.
     /// </summary>
     public static void ApplyFileLogging()
     {
-        if (!IsFileLogging)
+        try
         {
-            Logger.DeleteLogFile(); // Удаляем файл логов
-            LogInfo("File logging has been disabled. The log file has been deleted.");
+            // Передаем состояние записи логов в Logger.
+            Logger.IsFileLoggingEnabled = IsFileLogging;
+
+            // Проверяем отключение записи логов.
+            if (!IsFileLogging)
+            {
+                Logger.DeleteLogFile();
+
+                LogInfo("File logging disabled. Log file deleted.");
+                return;
+            }
+
+            LogInfo("File logging enabled.");
         }
-        else
+        catch (Exception exception)
         {
-            LogInfo("File logging is enabled. Logs will now be saved to a file.");
+            LogError($"Failed to apply file logging: {exception.Message}");
         }
     }
 
+    #endregion
+
+
+    #region Создание объектов
+
     /// <summary>
-    /// Метод для логирования ошибок
+    /// Метод создает настройки со значениями по умолчанию.
     /// </summary>
-    /// <param name="message">Сообщение для логирования</param>
-    private static void LogError(string message)
+    /// <returns>Объект настроек по умолчанию.</returns>
+    private static SettingsData CreateDefaultSettings()
     {
-        Logger.Log(Logger.LogLevel.Error, nameof(Settings), message);
+        // Создаем новый объект настроек.
+        SettingsData settings = new SettingsData();
+
+        // Возвращаем созданные настройки.
+        return settings;
     }
 
     /// <summary>
-    /// Метод для логирования предупреждений
+    /// Метод создает директорию для файла настроек.
     /// </summary>
-    /// <param name="message">Сообщение для логирования</param>
+    private static void CreateSettingsDirectory()
+    {
+        // Получаем путь к директории настроек.
+        string directoryPath = Path.GetDirectoryName(_settingsFilePath);
+
+        // Проверяем корректность пути.
+        if (string.IsNullOrWhiteSpace(directoryPath))
+        {
+            LogError("Settings directory path is invalid.");
+            return;
+        }
+
+        // Создаем директорию при отсутствии.
+        if (!Directory.Exists(directoryPath))
+        {
+            Directory.CreateDirectory(directoryPath);
+        }
+    }
+
+    #endregion
+
+
+    #region Проверка настроек
+
+    /// <summary>
+    /// Метод проверяет корректность всех настроек.
+    /// </summary>
+    /// <returns>True, если все настройки корректны.</returns>
+    private static bool ValidateSettings()
+    {
+        // Флаг результата проверки.
+        bool isValid = true;
+
+
+        // Проверяем разрешение экрана.
+        if (!ValidateResolution(_currentSettings.ScreenResolution))
+        {
+            _currentSettings.ScreenResolution = DefaultSettings.ScreenResolution;
+
+            isValid = false;
+
+            LogWarning("Invalid screen resolution. Default value restored.");
+        }
+
+
+        // Проверяем локализацию.
+        if (!ValidateString(_currentSettings.Localization))
+        {
+            _currentSettings.Localization = DefaultSettings.Localization;
+
+            isValid = false;
+
+            LogWarning("Invalid localization. Default value restored.");
+        }
+
+
+        // Проверяем код языка.
+        if (!ValidateString(_currentSettings.LanguageCode))
+        {
+            _currentSettings.LanguageCode = DefaultSettings.LanguageCode;
+
+            isValid = false;
+
+            LogWarning("Invalid language code. Default value restored.");
+        }
+
+
+        // Ограничиваем громкость музыки.
+        _currentSettings.MusicVolume = Mathf.Clamp(
+            _currentSettings.MusicVolume,
+            Constants.MinVolume,
+            Constants.MaxVolume
+        );
+
+
+        // Ограничиваем громкость звуков.
+        _currentSettings.SoundVolume = Mathf.Clamp(
+            _currentSettings.SoundVolume,
+            Constants.MinVolume,
+            Constants.MaxVolume
+        );
+
+
+        return isValid;
+    }
+
+    /// <summary>
+    /// Метод проверяет формат разрешения экрана.
+    /// </summary>
+    /// <param name="resolution">Разрешение экрана.</param>
+    /// <returns>True, если разрешение корректное.</returns>
+    private static bool ValidateResolution(string resolution)
+    {
+        // Проверяем строку регулярным выражением.
+        return !string.IsNullOrWhiteSpace(resolution) &&
+               _resolutionRegex.IsMatch(resolution);
+    }
+
+    /// <summary>
+    /// Метод проверяет строковое значение.
+    /// </summary>
+    /// <param name="value">Проверяемая строка.</param>
+    /// <returns>True, если строка содержит значение.</returns>
+    private static bool ValidateString(string value)
+    {
+        // Проверяем наличие текста.
+        return !string.IsNullOrWhiteSpace(value);
+    }
+
+    #endregion
+
+    #region Вспомогательные методы
+
+    /// <summary>
+    /// Метод получает нормализованное значение громкости музыки.
+    /// </summary>
+    /// <returns>Значение громкости от 0 до 1.</returns>
+    private static float GetNormalizedMusicVolume()
+    {
+        // Преобразуем процентное значение громкости в диапазон 0-1.
+        return Mathf.Clamp(
+            MusicVolume / Constants.MaxVolume,
+            0f,
+            1f
+        );
+    }
+
+    /// <summary>
+    /// Метод получает нормализованное значение громкости звуков.
+    /// </summary>
+    /// <returns>Значение громкости от 0 до 1.</returns>
+    private static float GetNormalizedSoundVolume()
+    {
+        // Преобразуем процентное значение громкости в диапазон 0-1.
+        return Mathf.Clamp(
+            SoundVolume / Constants.MaxVolume,
+            0f,
+            1f
+        );
+    }
+
+    #endregion
+
+
+    #region Логирование
+
+    /// <summary>
+    /// Метод записывает информационное сообщение.
+    /// </summary>
+    /// <param name="message">Сообщение для записи.</param>
+    private static void LogInfo(string message)
+    {
+        Logger.Log(Logger.LogLevel.Info, nameof(Settings), message);
+    }
+
+    /// <summary>
+    /// Метод записывает предупреждение.
+    /// </summary>
+    /// <param name="message">Сообщение предупреждения.</param>
     private static void LogWarning(string message)
     {
         Logger.Log(Logger.LogLevel.Warning, nameof(Settings), message);
     }
 
     /// <summary>
-    /// Метод для логирования информационных сообщений
+    /// Метод записывает ошибку.
     /// </summary>
-    /// <param name="message">Сообщение для логирования</param>
-    private static void LogInfo(string message)
+    /// <param name="message">Сообщение ошибки.</param>
+    private static void LogError(string message)
     {
-        Logger.Log(Logger.LogLevel.Info, nameof(Settings), message);
+        Logger.Log(Logger.LogLevel.Error, nameof(Settings), message);
     }
+
+    #endregion
 }

@@ -1,42 +1,114 @@
 
+/// <summary>
+/// Класс хранит глобальные данные игры.
+/// </summary>
 public static class Globals
 {
-    // Значение состояния загрузки сцены
+    #region Приватные поля
+
+    // Состояние загрузки текущей сцены.
     private static bool _isSceneLoading = true;
 
-    // Свойство для доступа к состоянию загрузки сцены
+    // Имя текущего игрока.
+    private static string _playerName = string.Empty;
+
+    #endregion
+
+
+    #region Публичные свойства
+
+    /// <summary>
+    /// Свойство получает или устанавливает состояние загрузки сцены.
+    /// </summary>
     public static bool IsSceneLoading
     {
         get => _isSceneLoading;
+
         set => _isSceneLoading = value;
     }
 
-    // Имя игрока
-    private static string _playerName = string.Empty;
-
-    // Свойство для получения и установки имени игрока
+    /// <summary>
+    /// Свойство получает или устанавливает имя игрока.
+    /// </summary>
     public static string PlayerName
     {
         get => _playerName;
+
         set
         {
-            if (!string.IsNullOrWhiteSpace(value))
+            if (ValidatePlayerName(value))
             {
-                _playerName = value;
+                _playerName = value.Trim();
+                return;
             }
-            else
-            {
-                LogError("Player name cannot be null or empty!");
-            }
+
+            LogError("Player name cannot be null or empty.");
         }
     }
 
+    #endregion
+
+
+    #region Публичные методы
+
     /// <summary>
-    /// Метод для логирования ошибок
+    /// Метод очищает сохраненное имя игрока.
     /// </summary>
-    /// <param name="message">Сообщение для логирования</param>
+    public static void ClearPlayerName()
+    {
+        // Устанавливаем пустое значение имени игрока.
+        _playerName = string.Empty;
+
+        LogInfo("Player name cleared.");
+    }
+
+    #endregion
+
+
+    #region Приватные методы проверки
+
+    /// <summary>
+    /// Метод проверяет корректность имени игрока.
+    /// </summary>
+    /// <param name="playerName">Имя игрока для проверки.</param>
+    /// <returns>True, если имя корректное.</returns>
+    private static bool ValidatePlayerName(string playerName)
+    {
+        // Проверяем, что строка существует и содержит символы.
+        return !string.IsNullOrWhiteSpace(playerName);
+    }
+
+    #endregion
+
+
+    #region Логирование
+
+    /// <summary>
+    /// Метод записывает информационное сообщение.
+    /// </summary>
+    /// <param name="message">Сообщение для записи.</param>
+    private static void LogInfo(string message)
+    {
+        Logger.Log(Logger.LogLevel.Info, nameof(Globals), message);
+    }
+
+    /// <summary>
+    /// Метод записывает предупреждение.
+    /// </summary>
+    /// <param name="message">Сообщение предупреждения.</param>
+    private static void LogWarning(string message)
+    {
+        Logger.Log(Logger.LogLevel.Warning, nameof(Globals), message);
+    }
+
+    /// <summary>
+    /// Метод записывает ошибку.
+    /// </summary>
+    /// <param name="message">Сообщение ошибки.</param>
     private static void LogError(string message)
     {
         Logger.Log(Logger.LogLevel.Error, nameof(Globals), message);
     }
+
+    #endregion
 }
