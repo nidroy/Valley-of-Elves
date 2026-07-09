@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.UI;
 
 /// <summary>
 /// Класс управляет главным меню игры.
@@ -8,17 +9,29 @@ public class MainMenuManager : MonoBehaviour
 {
     #region Приватные поля
 
-    // Экран загрузки игры.
+    // Менеджер загрузки сцен.
     [SerializeField]
-    private GameObject _loadingScreenObject;
-
-    // Экран меню настроек.
-    [SerializeField]
-    private GameObject _settingsMenuObject;
+    private SceneLoader _sceneLoader;
 
     // Менеджер меню настроек.
     [SerializeField]
     private SettingsMenuManager _settingsMenuManager;
+
+    // Объект меню настроек.
+    [SerializeField]
+    private GameObject _settingsMenuObject;
+
+    // Кнопка продолжения игры.
+    [SerializeField]
+    private Button _continueButton;
+
+    // Кнопка открытия меню настроек.
+    [SerializeField]
+    private Button _settingsButton;
+
+    // Название сцены игры.
+    [SerializeField]
+    private string _defaultGameScene = "Game";
 
     #endregion
 
@@ -39,12 +52,10 @@ public class MainMenuManager : MonoBehaviour
             HideSettingsMenu();
 
             // Инициализируем главное меню.
-            if (!InitializeMenu())
-            {
-                LogError("Main menu initialization failed.");
+            InitializeMenu();
 
-                return;
-            }
+            // Обновляем состояние кнопок.
+            UpdateMenuButtons();
 
             // Скрываем экран загрузки.
             HideLoadingScreen();
@@ -61,6 +72,64 @@ public class MainMenuManager : MonoBehaviour
 
 
     #region Публичные методы
+
+    /// <summary>
+    /// Метод запускает новую игру.
+    /// </summary>
+    public void NewGame()
+    {
+        try
+        {
+            // Создаем новое сохранение.
+            GameData.CreateNewSave();
+
+            // Проверяем сцену сохранения.
+            PrepareGameScene();
+
+            // Загружаем игровую сцену.
+            LoadGameScene();
+
+            LogInfo("New game started.");
+        }
+        catch (Exception exception)
+        {
+            LogError($"Failed to start new game: {exception.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Метод продолжает сохраненную игру.
+    /// </summary>
+    public void ContinueGame()
+    {
+        try
+        {
+            // Проверяем наличие сохранения.
+            if (!GameData.SaveFileExists())
+            {
+                LogWarning("Cannot continue game. Save file does not exist.");
+
+                return;
+            }
+
+            // Загружаем сохраненные данные.
+            if (!GameData.LoadSave())
+            {
+                LogError("Failed to load saved game.");
+
+                return;
+            }
+
+            // Загружаем сцену сохранения.
+            LoadGameScene();
+
+            LogInfo("Saved game continued.");
+        }
+        catch (Exception exception)
+        {
+            LogError($"Failed to continue game: {exception.Message}");
+        }
+    }
 
     /// <summary>
     /// Метод показывает меню настроек.
@@ -136,48 +205,134 @@ public class MainMenuManager : MonoBehaviour
     /// <summary>
     /// Метод выполняет первоначальную инициализацию меню.
     /// </summary>
-    /// <returns>True, если инициализация успешна.</returns>
-    private bool InitializeMenu()
+    private void InitializeMenu()
     {
         // Инициализируем настройки.
-        return InitializeSettings();
+        InitializeSettings();
     }
 
     /// <summary>
     /// Метод инициализирует систему настроек.
     /// </summary>
-    /// <returns>True, если настройки успешно загружены.</returns>
-    private bool InitializeSettings()
+    private void InitializeSettings()
     {
-        // Проверяем наличие менеджера настроек.
+        // Проверяем менеджер настроек.
         if (_settingsMenuManager == null)
         {
             LogError("Settings menu manager is null.");
 
-            return false;
+            return;
         }
 
         // Загружаем и применяем настройки.
         _settingsMenuManager.Init();
 
-        return true;
+        LogInfo("Settings initialized.");
     }
 
     #endregion
 
 
-    #region Управление экраном загрузки
+    #region Работа с игрой
+
+    /// <summary>
+    /// Метод подготавливает сцену игры.
+    /// </summary>
+    private void PrepareGameScene()
+    {
+        // Проверяем наличие названия сцены.
+        if (!string.IsNullOrWhiteSpace(_defaultGameScene))
+        {
+            GameData.SceneName = _defaultGameScene;
+        }
+    }
+
+    /// <summary>
+    /// Метод загружает игровую сцену.
+    /// </summary>
+    private void LoadGameScene()
+    {
+        // Проверяем наличие загрузчика сцен.
+        if (_sceneLoader == null)
+        {
+            LogError("Scene loader is null.");
+
+            return;
+        }
+
+        // Загружаем сцену.
+        _sceneLoader.LoadScene(GameData.SceneName);
+    }
+
+    /// <summary>
+    /// Метод обновляет состояние кнопок главного меню.
+    /// </summary>
+    private void UpdateMenuButtons()
+    {
+        // Проверяем кнопку продолжения игры.
+        UpdateContinueButton();
+
+        // Проверяем кнопку настроек.
+        UpdateSettingsButton();
+    }
+
+    /// <summary>
+    /// Метод обновляет состояние кнопки продолжения игры.
+    /// </summary>
+    private void UpdateContinueButton()
+    {
+        // Проверяем наличие кнопки.
+        if (_continueButton == null)
+        {
+            LogWarning("Continue button is null.");
+
+            return;
+        }
+
+        // Активируем кнопку только при наличии сохранения.
+        _continueButton.interactable = GameData.SaveFileExists();
+    }
+
+    /// <summary>
+    /// Метод обновляет состояние кнопки настроек.
+    /// </summary>
+    private void UpdateSettingsButton()
+    {
+        // Проверяем наличие кнопки.
+        if (_settingsButton == null)
+        {
+            LogWarning("Settings button is null.");
+
+            return;
+        }
+
+        /// Проверяем возможность открытия меню настроек.
+        _settingsButton.interactable =
+            _settingsMenuObject != null &&
+            _settingsMenuManager != null &&
+            Settings.SettingsFileExists();
+    }
+
+    #endregion
+
+
+    #region Экран загрузки
 
     /// <summary>
     /// Метод показывает экран загрузки.
     /// </summary>
     private void ShowLoadingScreen()
     {
+        // Проверяем загрузчик сцен.
+        if (_sceneLoader == null)
+        {
+            LogWarning("Scene loader is null.");
+
+            return;
+        }
+
         // Показываем экран загрузки.
-        ShowObject(_loadingScreenObject);
-
-
-        LogInfo("Loading screen shown.");
+        _sceneLoader.ShowLoadingScreen();
     }
 
     /// <summary>
@@ -185,10 +340,16 @@ public class MainMenuManager : MonoBehaviour
     /// </summary>
     private void HideLoadingScreen()
     {
-        // Скрываем экран загрузки.
-        HideObject(_loadingScreenObject);
+        // Проверяем загрузчик сцен.
+        if (_sceneLoader == null)
+        {
+            LogWarning("Scene loader is null.");
 
-        LogInfo("Loading screen hidden.");
+            return;
+        }
+
+        // Скрываем экран загрузки.
+        _sceneLoader.HideLoadingScreen();
     }
 
     #endregion
@@ -212,8 +373,6 @@ public class MainMenuManager : MonoBehaviour
 
         // Активируем объект.
         gameObject.SetActive(true);
-
-        LogInfo($"Object shown: {gameObject.name}.");
     }
 
     /// <summary>
@@ -232,8 +391,6 @@ public class MainMenuManager : MonoBehaviour
 
         // Отключаем объект.
         gameObject.SetActive(false);
-
-        LogInfo($"Object hidden: {gameObject.name}.");
     }
 
     #endregion
@@ -251,7 +408,7 @@ public class MainMenuManager : MonoBehaviour
 
 #if UNITY_EDITOR
 
-        // Останавливаем игру в редакторе Unity.
+        // Останавливаем запуск игры в редакторе Unity.
         UnityEditor.EditorApplication.isPlaying = false;
 
 #endif

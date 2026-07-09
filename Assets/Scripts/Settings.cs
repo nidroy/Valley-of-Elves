@@ -251,53 +251,26 @@ public static class Settings
         try
         {
             // Проверяем наличие файла настроек.
-            if (!File.Exists(_settingsFilePath))
+            if (!SettingsFileExists())
             {
+                // Устанавливаем настройки по умолчанию.
                 SetDefaultSettings();
+
+                // Создаем новый файл настроек.
                 Save();
 
                 LogWarning("Settings file not found. Default settings created.");
+
                 return;
             }
 
-            // Читаем содержимое файла.
-            string json = File.ReadAllText(_settingsFilePath);
-
-            // Проверяем пустой файл.
-            if (string.IsNullOrWhiteSpace(json))
-            {
-                SetDefaultSettings();
-                Save();
-
-                LogWarning("Settings file is empty. Default settings restored.");
-                return;
-            }
-
-            // Загружаем настройки из JSON.
-            SettingsData loadedSettings = JsonUtility.FromJson<SettingsData>(json);
-
-            // Проверяем результат загрузки.
-            if (loadedSettings == null)
-            {
-                SetDefaultSettings();
-                Save();
-
-                LogWarning("Settings data is invalid. Default settings restored.");
-                return;
-            }
-
-            // Применяем загружанные настройки.
-            _currentSettings = loadedSettings;
-
-            // Проверяем корректность значений.
-            ValidateSettings();
+            // Загружаем настройки из существующего файла.
+            LoadSettingsFromFile();
 
             LogInfo("Settings loaded successfully.");
         }
         catch (Exception exception)
         {
-            SetDefaultSettings();
-
             LogError($"Failed to load settings: {exception.Message}");
         }
     }
@@ -489,6 +462,16 @@ public static class Settings
         }
     }
 
+    /// <summary>
+    /// Метод проверяет существование файла настроек.
+    /// </summary>
+    /// <returns>True, если файл настроек существует.</returns>
+    public static bool SettingsFileExists()
+    {
+        // Проверяем существование файла.
+        return File.Exists(_settingsFilePath);
+    }
+
     #endregion
 
 
@@ -621,7 +604,22 @@ public static class Settings
 
     #endregion
 
+
     #region Вспомогательные методы
+
+    /// <summary>
+    /// Метод загружает настройки из файла.
+    /// </summary>
+    private static void LoadSettingsFromFile()
+    {
+        // Читаем содержимое файла настроек.
+        string json = File.ReadAllText(_settingsFilePath);
+
+        // Преобразуем JSON в объект настроек.
+        _currentSettings = JsonUtility.FromJson<SettingsData>(json) ?? new SettingsData();
+
+        LogInfo("Settings loaded from file.");
+    }
 
     /// <summary>
     /// Метод получает нормализованное значение громкости музыки.
