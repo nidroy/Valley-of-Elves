@@ -737,7 +737,7 @@ PlayerSettings:
   m_RenderingPath: 1
   m_MobileRenderingPath: 1
   metroPackageName: Valley-of-Elves
-  metroPackageVersion: 
+  metroPackageVersion: 1.0.0.0
   metroCertificatePath: 
   metroCertificatePassword: 
   metroCertificateSubject: 
@@ -745,7 +745,7 @@ PlayerSettings:
   metroCertificateNotAfter: 0000000000000000
   metroApplicationDescription: Valley-of-Elves
   wsaImages: {}
-  metroTileShortName: 
+  metroTileShortName: Valley-of-Elves
   metroTileShowName: 0
   metroMediumTileShowName: 0
   metroLargeTileShowName: 0
