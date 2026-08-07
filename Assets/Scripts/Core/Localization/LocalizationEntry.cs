@@ -1,11 +1,19 @@
 using System;
 
 /// <summary>
-/// Одна запись локализации.
+/// Запись локализации.
+/// Содержит ключ и соответствующий ему текст.
 /// </summary>
 [Serializable]
 public class LocalizationEntry
 {
+    /// <summary>
+    /// Уникальный ключ строки локализации.
+    /// </summary>
     public string Key;
-    public string Value;
+
+    /// <summary>
+    /// Текст, который соответствует ключу локализации.
+    /// </summary>
+    public string Text;
 }

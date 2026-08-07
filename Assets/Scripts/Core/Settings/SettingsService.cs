@@ -1,166 +1,115 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using TMPro;
 using UnityEngine;
 
 /// <summary>
 /// Сервис управления настройками игры.
-/// Отвечает за загрузку, сохранение и применение настроек.
-/// UI в этом классе не обрабатывается.
+/// Отвечает за загрузку, сохранение, удаление и применение настроек игры.
 /// </summary>
 public static class SettingsService
 {
-    private const string GameFolderName = "Valley of Elves";
-
-    private static readonly SettingsFileRepository Repository =
-        new SettingsFileRepository(GameFolderName);
-
-    private static SettingsData _settings = new SettingsData();
-
     /// <summary>
-    /// Текущие настройки в памяти.
+    /// Репозиторий для работы с файлом настроек.
     /// </summary>
-    public static SettingsData Current => _settings;
+    private static readonly SettingsFileRepository _settingsFileRepository =
+        new SettingsFileRepository(Globals.GameSettingsFilePath);
 
     /// <summary>
-    /// Получает или устанавливает разрешение экрана.
+    /// Настройки, хранящиеся в памяти.
+    /// </summary>
+    private static SettingsData _settingsData = new SettingsData();
+
+
+
+    /// <summary>
+    /// Свойство получает или устанавливает разрешение экрана.
     /// Формат: "ШиринаxВысота".
     /// </summary>
     public static string ScreenResolution
     {
-        get => _settings.ScreenResolution;
-        set => _settings.ScreenResolution = value?.Trim() ?? _settings.ScreenResolution;
+        get => _settingsData.ScreenResolution;
+        set => _settingsData.ScreenResolution = value?.Trim() ?? _settingsData.ScreenResolution;
     }
 
     /// <summary>
-    /// Получает или устанавливает полноэкранный режим.
+    /// Свойство получает или устанавливает полноэкранный режим.
     /// </summary>
     public static bool IsFullScreen
     {
-        get => _settings.IsFullScreen;
-        set => _settings.IsFullScreen = value;
+        get => _settingsData.IsFullScreen;
+        set => _settingsData.IsFullScreen = value;
     }
 
     /// <summary>
-    /// Получает или устанавливает громкость музыки.
+    /// Свойство получает или устанавливает громкость музыки.
     /// Значение хранится в диапазоне от 0 до 100.
     /// </summary>
     public static float MusicVolume
     {
-        get => _settings.MusicVolume;
-        set => _settings.MusicVolume = Mathf.Clamp(value, 0f, 100f);
+        get => _settingsData.MusicVolume;
+        set => _settingsData.MusicVolume = Mathf.Clamp(value, 0f, 100f);
     }
 
     /// <summary>
-    /// Получает или устанавливает громкость звуков.
+    /// Свойство получает или устанавливает громкость звуков.
     /// Значение хранится в диапазоне от 0 до 100.
     /// </summary>
     public static float SoundVolume
     {
-        get => _settings.SoundVolume;
-        set => _settings.SoundVolume = Mathf.Clamp(value, 0f, 100f);
+        get => _settingsData.SoundVolume;
+        set => _settingsData.SoundVolume = Mathf.Clamp(value, 0f, 100f);
     }
 
     /// <summary>
-    /// Получает или устанавливает название локализации.
+    /// Свойство получает или устанавливает название локализации.
     /// </summary>
     public static string Localization
     {
-        get => _settings.Localization;
-        set => _settings.Localization = value?.Trim() ?? _settings.Localization;
+        get => _settingsData.Localization;
+        set => _settingsData.Localization = value?.Trim() ?? _settingsData.Localization;
     }
 
     /// <summary>
-    /// Получает или устанавливает код языка.
+    /// Свойство получает или устанавливает код языка.
     /// </summary>
     public static string LanguageCode
     {
-        get => _settings.LanguageCode;
-        set => _settings.LanguageCode = value?.Trim() ?? _settings.LanguageCode;
+        get => _settingsData.LanguageCode;
+        set => _settingsData.LanguageCode = value?.Trim() ?? _settingsData.LanguageCode;
     }
 
     /// <summary>
-    /// Получает или устанавливает запись логов в файл.
+    /// Свойство получает или устанавливает включение записи логов в файл.
     /// </summary>
     public static bool IsFileLogging
     {
-        get => _settings.IsFileLogging;
-        set => _settings.IsFileLogging = value;
+        get => _settingsData.IsFileLogging;
+        set => _settingsData.IsFileLogging = value;
     }
 
-    /// <summary>
-    /// Получает или устанавливает уровень качества графики.
-    /// </summary>
-    public static int QualityLevel
-    {
-        get => _settings.QualityLevel;
-        set => _settings.QualityLevel = Mathf.Clamp(value, 0, Mathf.Max(0, QualitySettings.names.Length - 1));
-    }
+
 
     /// <summary>
-    /// Получает или устанавливает VSync.
-    /// </summary>
-    public static bool IsVSync
-    {
-        get => _settings.IsVSync;
-        set => _settings.IsVSync = value;
-    }
-
-    /// <summary>
-    /// Получает или устанавливает ограничение FPS.
-    /// </summary>
-    public static int FrameRate
-    {
-        get => _settings.FrameRate;
-        set => _settings.FrameRate = Mathf.Max(30, value);
-    }
-
-    /// <summary>
-    /// Загружает настройки из файла.
-    /// Если файл отсутствует или повреждён, загружает значения по умолчанию.
-    /// </summary>
-    public static void Load()
-    {
-        try
-        {
-            if (!Repository.Exists())
-            {
-                Reset();
-                return;
-            }
-
-            string json = Repository.Load();
-            SettingsData loaded = JsonUtility.FromJson<SettingsData>(json);
-
-            if (loaded == null)
-            {
-                Reset();
-                return;
-            }
-
-            _settings = loaded;
-            SettingsDataValidator.Normalize(_settings);
-            LogInfo("Settings loaded.");
-        }
-        catch (Exception exception)
-        {
-            LogError($"Failed to load settings: {exception.Message}");
-            Reset();
-        }
-    }
-
-    /// <summary>
-    /// Сохраняет текущие настройки в файл.
+    /// Метод сохраняет текущие настройки в файл.
     /// </summary>
     public static void Save()
     {
         try
         {
-            SettingsDataValidator.Normalize(_settings);
-            string json = JsonUtility.ToJson(_settings, true);
-            Repository.Save(json);
-            LogInfo("Settings saved.");
+            SettingsDataValidator.Normalize(_settingsData);
+
+            string json = JsonUtility.ToJson(_settingsData, true);
+
+            if (string.IsNullOrWhiteSpace(json))
+            {
+                LogWarning("Settings serialization returned empty JSON. Save skipped.");
+                return;
+            }
+
+            _settingsFileRepository.Save(json);
+
+            LogInfo("Settings saved successfully.");
         }
         catch (Exception exception)
         {
@@ -169,142 +118,216 @@ public static class SettingsService
     }
 
     /// <summary>
-    /// Сбрасывает настройки к значениям по умолчанию.
+    /// Метод загружает настройки из файла.
+    /// Если файл отсутствует, пустой или повреждён, загружает значения по умолчанию.
+    /// <returns>True, если настройки загружены успешно; иначе false.</returns>
     /// </summary>
-    public static void Reset()
+    public static bool Load()
     {
-        _settings = new SettingsData();
-        LogInfo("Settings reset.");
+        try
+        {
+            if (!_settingsFileRepository.Exists())
+            {
+                LogWarning("Settings file not found. Loading default settings.");
+
+                Default();
+
+                return false;
+            }
+
+            string json = _settingsFileRepository.Load();
+
+            if (string.IsNullOrWhiteSpace(json))
+            {
+                LogWarning("Settings file is empty. Loading default settings.");
+
+                Default();
+
+                return false;
+            }
+
+            SettingsData loaded = JsonUtility.FromJson<SettingsData>(json);
+
+            if (loaded == null)
+            {
+                LogWarning("Failed to deserialize settings. Loading default settings.");
+
+                Default();
+
+                return false;
+            }
+
+            _settingsData = loaded;
+
+            SettingsDataValidator.Normalize(_settingsData);
+
+            LogInfo("Settings loaded successfully.");
+
+            return true;
+        }
+        catch (Exception exception)
+        {
+            LogError($"Failed to load settings: {exception.Message}");
+
+            Default();
+
+            return false;
+        }
     }
 
     /// <summary>
-    /// Применяет все настройки к системе.
+    /// Метод сбрасывает настройки к значениям по умолчанию.
     /// </summary>
-    public static void ApplyToSystem()
+    public static void Default()
     {
-        ApplyScreenResolution();
-        ApplyFullScreen();
-        ApplyQuality();
-        ApplyFrameRate();
-        ApplyVSync();
-        ApplyFileLogging();
+        _settingsData = new SettingsData();
+
+        LogInfo("Settings reset to default values.");
+    }
+
+
+
+    /// <summary>
+    /// Метод применяет текущие настройки из памяти.
+    /// </summary>
+    public static void Apply()
+    {
+        LogInfo("Applying current settings.");
+
+        ApplyScreenResolution(_settingsData.ScreenResolution, _settingsData.IsFullScreen);
+        ApplyFullScreen(_settingsData.IsFullScreen);
+        ApplyFileLogging(_settingsData.IsFileLogging);
+
+        LogInfo("Current settings applied successfully.");
     }
 
     /// <summary>
-    /// Применяет разрешение экрана.
+    /// Метод применяет разрешение экрана.
     /// </summary>
-    public static void ApplyScreenResolution()
+    /// <param name="screenResolution">Разрешение экрана в формате "ШиринаxВысота".</param>
+    /// <param name="isFullScreen">Признак полноэкранного режима.</param>
+    public static void ApplyScreenResolution(string screenResolution, bool isFullScreen)
     {
-        string[] values = ScreenResolution.Split('x');
+        if (string.IsNullOrWhiteSpace(screenResolution))
+        {
+            LogWarning("Screen resolution is empty. Apply skipped.");
+            return;
+        }
+
+        string[] values = screenResolution.Split('x');
 
         if (values.Length != 2)
         {
-            LogWarning($"Invalid resolution format: {ScreenResolution}");
+            LogWarning($"Invalid resolution format: {screenResolution}");
             return;
         }
 
-        if (int.TryParse(values[0], out int width) &&
-            int.TryParse(values[1], out int height))
+        if (!int.TryParse(values[0], out int width) || !int.TryParse(values[1], out int height))
         {
-            Screen.SetResolution(width, height, IsFullScreen);
+            LogWarning($"Failed to parse resolution values: {screenResolution}");
+            return;
         }
+
+        Screen.SetResolution(width, height, isFullScreen);
+
+        LogInfo($"Screen resolution applied: {width}x{height}, fullscreen: {isFullScreen}");
     }
 
     /// <summary>
-    /// Применяет полноэкранный режим.
+    /// Метод применяет полноэкранный режим.
     /// </summary>
-    public static void ApplyFullScreen()
+    /// <param name="isFullScreen">True, если нужно включить полноэкранный режим; иначе false.</param>
+    public static void ApplyFullScreen(bool isFullScreen)
     {
-        Screen.fullScreen = IsFullScreen;
+        Screen.fullScreen = isFullScreen;
+
+        LogInfo($"Fullscreen mode applied: {isFullScreen}");
     }
 
     /// <summary>
-    /// Применяет громкость музыки к источнику.
+    /// Метод применяет громкость музыки к источнику.
     /// </summary>
-    public static void ApplyMusicVolume(AudioSource source)
+    /// <param name="source">Источник музыки, к которому будет применена громкость.</param>
+    /// <param name="volume">Громкость в диапазоне от 0 до 100.</param>
+    public static void ApplyMusicVolume(AudioSource source, float volume)
     {
         if (source == null)
         {
+            LogWarning("Music AudioSource is null. Apply skipped.");
             return;
         }
 
-        source.volume = MusicVolume / 100f;
+        source.volume = Mathf.Clamp(volume, 0f, 100f) / 100f;
+
+        LogInfo($"Music volume applied: {volume}%");
     }
 
     /// <summary>
-    /// Применяет громкость звуков к источнику.
+    /// Метод применяет громкость звуков к источнику.
     /// </summary>
-    public static void ApplySoundVolume(AudioSource source)
+    /// <param name="source">Источник звука, к которому будет применена громкость.</param>
+    /// <param name="volume">Громкость в диапазоне от 0 до 100.</param>
+    public static void ApplySoundVolume(AudioSource source, float volume)
     {
         if (source == null)
         {
+            LogWarning("Sound AudioSource is null. Apply skipped.");
             return;
         }
 
-        source.volume = SoundVolume / 100f;
+        source.volume = Mathf.Clamp(volume, 0f, 100f) / 100f;
+
+        LogInfo($"Sound volume applied: {volume}%");
     }
 
     /// <summary>
-    /// Применяет качество графики.
+    /// Метод применяет настройку записи логов в файл.
     /// </summary>
-    public static void ApplyQuality()
+    /// <param name="isFileLogging">True, если запись логов в файл должна быть включена; иначе false.</param>
+    public static void ApplyFileLogging(bool isFileLogging)
     {
-        if (QualitySettings.names.Length == 0)
+        Logger.ToggleFileLogging(isFileLogging);
+
+        LogInfo($"File logging applied: {isFileLogging}");
+    }
+
+    /// <summary>
+    /// Метод применяет локализацию к переданным UI-текстам.
+    /// </summary>
+    /// <param name="languageCode">Код языка.</param>
+    /// <param name="localizationTargets">Словарь ключей текстовых компонентов и UI-текстовых компонентов.</param>
+    public static void ApplyLocalization(string languageCode, Dictionary<string, TMP_Text> localizationTargets)
+    {
+        if (!LocalizationService.LoadLocalization(languageCode))
         {
+            LogWarning($"Localization load failed for language code: {languageCode}");
             return;
         }
 
-        QualitySettings.SetQualityLevel(QualityLevel, true);
-    }
-
-    /// <summary>
-    /// Применяет ограничение FPS.
-    /// </summary>
-    public static void ApplyFrameRate()
-    {
-        Application.targetFrameRate = FrameRate;
-    }
-
-    /// <summary>
-    /// Применяет VSync.
-    /// </summary>
-    public static void ApplyVSync()
-    {
-        QualitySettings.vSyncCount = IsVSync ? 1 : 0;
-    }
-
-    /// <summary>
-    /// Применяет настройку записи логов в файл.
-    /// </summary>
-    public static void ApplyFileLogging()
-    {
-        Logger.ConfigureFileLogging(IsFileLogging);
-    }
-
-    /// <summary>
-    /// Загружает локализацию и применяет её к переданным UI-элементам.
-    /// </summary>
-    /// <param name="words">Словарь ключей и текстовых компонентов.</param>
-    public static void ApplyLocalization(Dictionary<string, TMP_Text> words)
-    {
-        LocalizationService.LoadLocalization(LanguageCode);
-
-        if (words == null)
+        if (localizationTargets == null)
         {
+            LogWarning("Localization target dictionary is null. Apply skipped.");
             return;
         }
 
-        foreach (KeyValuePair<string, TMP_Text> pair in words)
+        foreach (KeyValuePair<string, TMP_Text> localizationTarget in localizationTargets)
         {
-            if (pair.Value != null)
+            if (localizationTarget.Value == null)
             {
-                pair.Value.text = LocalizationService.GetTranslation(pair.Key);
+                LogWarning($"TMP_Text is null for localization key: {localizationTarget.Key}");
+                continue;
             }
+
+            localizationTarget.Value.text = LocalizationService.GetTranslation(localizationTarget.Key);
         }
+
+        LogInfo($"Localization applied successfully for language code: {languageCode}");
     }
 
+
+
     /// <summary>
-    /// Логирует информационное сообщение.
+    /// Метод записывает информационное сообщение в лог.
     /// </summary>
     private static void LogInfo(string message)
     {
@@ -312,7 +335,7 @@ public static class SettingsService
     }
 
     /// <summary>
-    /// Логирует предупреждение.
+    /// Метод записывает предупреждение в лог.
     /// </summary>
     private static void LogWarning(string message)
     {
@@ -320,7 +343,7 @@ public static class SettingsService
     }
 
     /// <summary>
-    /// Логирует ошибку.
+    /// Метод записывает ошибку в лог.
     /// </summary>
     private static void LogError(string message)
     {

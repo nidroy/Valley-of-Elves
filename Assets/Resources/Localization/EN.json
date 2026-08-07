@@ -1,64 +1,68 @@
 {
-  "Words": [
+  "LocalizationEntries": [
     {
       "Key": "Main menu title",
-      "Value": "Valley of Elves"
+      "Text": "Valley of Elves"
     },
     {
       "Key": "New game button",
-      "Value": "New Game"
+      "Text": "New Game"
     },
     {
       "Key": "Continue button",
-      "Value": "Continue"
+      "Text": "Continue"
     },
     {
       "Key": "Settings button",
-      "Value": "Settings"
+      "Text": "Settings"
     },
     {
       "Key": "Quit game button",
-      "Value": "Quit Game"
+      "Text": "Quit Game"
     },
     {
       "Key": "Screen resolution title",
-      "Value": "Screen resolution"
+      "Text": "Screen resolution"
     },
     {
       "Key": "Localization title",
-      "Value": "Localization"
+      "Text": "Localization"
     },
     {
       "Key": "Full screen title",
-      "Value": "Full screen"
+      "Text": "Full screen"
     },
     {
       "Key": "File logging title",
-      "Value": "File logging"
+      "Text": "File logging"
     },
     {
       "Key": "Music volume title",
-      "Value": "Music volume"
+      "Text": "Music volume"
     },
     {
       "Key": "Sound volume title",
-      "Value": "Sound volume"
+      "Text": "Sound volume"
     },
     {
-      "Key": "Apply button",
-      "Value": "Apply"
+      "Key": "Save button",
+      "Text": "Save"
     },
     {
       "Key": "Cancel button",
-      "Value": "Cancel"
+      "Text": "Cancel"
     },
     {
-      "Key": "Back button",
-      "Value": "Back"
+      "Key": "Close button",
+      "Text": "Close"
+    },
+    {
+      "Key": "Apply button",
+      "Text": "Apply"
     },
     {
       "Key": "Loading screen text",
-      "Value": "The legends of the magical land of Farrun have been stirring the minds of sages for many years. After all, it was created by the Old Gods and hidden from prying eyes by a magic dome. These ancient lands are full of magic and inhabited by creatures that the elven eye has never seen. Farrun would have continued to be a fiction if a bright star had not fallen from the sky, which destroyed the magic dome. Needless to say, the leaders of the Elven nations immediately declared their rights to Farrun. Someone needs a central White castle where the great dragon Ebrung sleeps, someone seeks to capture magic towers that give the owners the ability to teleport their warriors, and someone just needs to expand the size of their empire. However, there is one small difficulty. The new gods are not very happy to see Farrun torn apart by the Elven rulers, so they have sent their best heroes to confront the elves. Mistress of Time, Eldagar and Atranax, the mighty servants of the new gods, have already arrived in the legendary land and are raising a rebellion of the local peoples against the elven rulers."
+      "Text": "The legends of the magical land of Farrun have been stirring the minds of sages for many years. After all, it was created by the Old Gods and hidden from prying eyes by a magic dome. These ancient lands are full of magic and inhabited by creatures that the elven eye has never seen. Farrun would have continued to be a fiction if a bright star had not fallen from the sky, which destroyed the magic dome. Needless to say, the leaders of the Elven nations immediately declared their rights to Farrun. Someone needs a central White castle where the great dragon Ebrung sleeps, someone seeks to capture magic towers that give the owners the ability to teleport their warriors, and someone just needs to expand the size of their empire. However, there is one small difficulty. The new gods are not very happy to see Farrun torn apart by the Elven rulers, so they have sent their best heroes to confront the elves. Mistress of Time, Eldagar and Atranax, the mighty servants of the new gods, have already arrived in the legendary land and are raising a rebellion of the local peoples against the elven rulers."
     }
   ]
 }

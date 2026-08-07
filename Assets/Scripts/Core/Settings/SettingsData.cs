@@ -1,68 +1,56 @@
 using System;
 
 /// <summary>
-/// Модель данных пользовательских настроек.
-/// Содержит только данные, без логики сохранения или применения.
+/// Модель данных настроек.
 /// </summary>
 [Serializable]
 public class SettingsData
 {
     /// <summary>
     /// Версия структуры настроек.
-    /// Используется для возможной миграции формата в будущем.
     /// </summary>
-    public int Version = 1;
+    public int Version = Globals.SettingsDefaultVersion;
+
+
 
     /// <summary>
     /// Разрешение экрана в формате "ШиринаxВысота".
-    /// Пример: "1920x1080".
     /// </summary>
-    public string ScreenResolution = "1920x1080";
+    public string ScreenResolution = Globals.SettingsDefaultScreenResolution;
 
     /// <summary>
     /// Включён ли полноэкранный режим.
     /// </summary>
-    public bool IsFullScreen = true;
+    public bool IsFullScreen = Globals.SettingsDefaultIsFullScreen;
+
+
 
     /// <summary>
     /// Громкость музыки в диапазоне от 0 до 100.
     /// </summary>
-    public float MusicVolume = 100f;
+    public float MusicVolume = Globals.SettingsDefaultMusicVolume;
 
     /// <summary>
     /// Громкость звуков в диапазоне от 0 до 100.
     /// </summary>
-    public float SoundVolume = 100f;
+    public float SoundVolume = Globals.SettingsDefaultMusicVolume;
+
+
 
     /// <summary>
     /// Название текущей локализации.
-    /// Пример: "English", "Русский".
     /// </summary>
-    public string Localization = "English";
+    public string Localization = Globals.SettingsDefaultLocalization;
 
     /// <summary>
     /// Код языка.
-    /// Пример: "EN", "RU".
     /// </summary>
-    public string LanguageCode = "EN";
+    public string LanguageCode = Globals.SettingsDefaultLanguageCode;
+
+
 
     /// <summary>
     /// Включена ли запись логов в файл.
     /// </summary>
-    public bool IsFileLogging = true;
-
-    /// <summary>
-    /// Индекс уровня качества графики.
-    /// </summary>
-    public int QualityLevel = 3;
-
-    /// <summary>
-    /// Включён ли VSync.
-    /// </summary>
-    public bool IsVSync = true;
-
-    /// <summary>
-    /// Ограничение частоты кадров.
-    /// </summary>
-    public int FrameRate = 60;
+    public bool IsFileLogging = Globals.SettingsDefaultIsFileLogging;
 }

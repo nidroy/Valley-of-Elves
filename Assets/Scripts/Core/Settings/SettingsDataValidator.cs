@@ -1,38 +1,46 @@
 using UnityEngine;
 
 /// <summary>
-/// Выполняет нормализацию и проверку данных настроек.
+/// Валидатор данных настроек.
+/// Нормализатор приводит значения к безопасным диапазонам.
 /// </summary>
 public static class SettingsDataValidator
 {
     /// <summary>
-    /// Приводит данные настроек к допустимым значениям.
+    /// Метод приводит данные настроек к безопасному и корректному состоянию.
     /// </summary>
+    /// <param name="data">Объект данных настроек, который нужно проверить и исправить.</param>
     public static void Normalize(SettingsData data)
     {
+        // Если объект не передан, ничего не делаем.
         if (data == null)
         {
             return;
         }
 
+        // Версия не может быть меньше 1.
         data.Version = Mathf.Max(1, data.Version);
+
+        // Громкость ограничивается диапазоном от 0 до 100.
         data.MusicVolume = Mathf.Clamp(data.MusicVolume, 0f, 100f);
         data.SoundVolume = Mathf.Clamp(data.SoundVolume, 0f, 100f);
-        data.FrameRate = Mathf.Max(30, data.FrameRate);
 
+        // Если разрешение не задано, используем значение по умолчанию.
         if (string.IsNullOrWhiteSpace(data.ScreenResolution))
         {
-            data.ScreenResolution = "1920x1080";
+            data.ScreenResolution = Globals.SettingsDefaultScreenResolution;
         }
 
+        // Если локализация не задана, используем значение по умолчанию.
         if (string.IsNullOrWhiteSpace(data.Localization))
         {
-            data.Localization = "English";
+            data.Localization = Globals.SettingsDefaultLocalization;
         }
 
+        // Если код языка не задан, используем значение по умолчанию.
         if (string.IsNullOrWhiteSpace(data.LanguageCode))
         {
-            data.LanguageCode = "EN";
+            data.LanguageCode = Globals.SettingsDefaultLanguageCode;
         }
     }
 }
