@@ -23,6 +23,19 @@ public class MainMenuView : MonoBehaviour
     [SerializeField]
     private GameObject _playerCreationMenu;
 
+    /// <summary>
+    /// Экран загрузки.
+    /// </summary>
+    [SerializeField]
+    private GameObject _loadingScreen;
+
+
+
+    /// <summary>
+    /// Контроллер экрана загрузки.
+    /// </summary>
+    private LoadingScreenController _loadingScreenController;
+
 
 
     /// <summary>
@@ -63,6 +76,8 @@ public class MainMenuView : MonoBehaviour
     private void Awake()
     {
         LogInfo("Main menu initialization started.");
+
+        _loadingScreenController = new LoadingScreenController(this, _loadingScreen);
 
         HideSettingsMenu();
         HidePlayerCreationMenu();
@@ -261,8 +276,14 @@ public class MainMenuView : MonoBehaviour
                 return;
             }
 
+            if (_loadingScreenController == null)
+            {
+                LogWarning("Loading screen controller is not assigned. Continue aborted.");
+                return;
+            }
+
             LogInfo($"Loading saved scene: {sceneName}");
-            SceneManager.LoadScene(sceneName);
+            _loadingScreenController.LoadScene(sceneName);
         }
         catch (System.Exception exception)
         {
