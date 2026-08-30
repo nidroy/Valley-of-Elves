@@ -1,0 +1,20 @@
+fileFormatVersion: 2
+guid: 1d77725890ba4b24482807ccf9ca9f28
+timeCreated: 1527183738
+licenseType: Store
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 55845
+  packageName: 2D Asset Pack - 5 Worlds
+  packageVersion: 2.2
+  assetPath: Assets/Five Worlds Asset Pack/Scripts/TouchController.cs
+  uploadId: 592465

@@ -1,0 +1,20 @@
+fileFormatVersion: 2
+guid: 585602cc55d722541ba026cb1400ebf9
+timeCreated: 1527149919
+licenseType: Store
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 55845
+  packageName: 2D Asset Pack - 5 Worlds
+  packageVersion: 2.2
+  assetPath: Assets/Five Worlds Asset Pack/Scripts/LevelController.cs
+  uploadId: 592465

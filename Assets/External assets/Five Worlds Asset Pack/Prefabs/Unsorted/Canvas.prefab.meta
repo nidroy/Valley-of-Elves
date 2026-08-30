@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 16da2bf42fd3b8d4692fc496e549d061
+timeCreated: 1527355189
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 55845
+  packageName: 2D Asset Pack - 5 Worlds
+  packageVersion: 2.2
+  assetPath: Assets/Five Worlds Asset Pack/Prefabs/Unsorted/Canvas.prefab
+  uploadId: 592465
