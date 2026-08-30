@@ -296,7 +296,7 @@ public static class SettingsService
     /// </summary>
     /// <param name="languageCode">Код языка.</param>
     /// <param name="localizationTargets">Словарь ключей текстовых компонентов и UI-текстовых компонентов.</param>
-    public static void ApplyLocalization(string languageCode, Dictionary<string, TMP_Text> localizationTargets)
+    public static void ApplyLocalization(string languageCode, List<KeyValuePair<string, TMP_Text>> localizationTargets)
     {
         if (!LocalizationService.LoadLocalization(languageCode))
         {

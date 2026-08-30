@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using TMPro;
-using UnityEditor.Localization.Editor;
 using UnityEngine;
 
 /// <summary>
@@ -14,7 +13,7 @@ public class SettingsMenuController
     /// <summary>
     /// Словарь локализуемых UI-элементов: ключ текстового компонента -> текстовый компонент.
     /// </summary>
-    private readonly Dictionary<string, TMP_Text> _localizationTargetsDictionary = new Dictionary<string, TMP_Text>();
+    private readonly List<KeyValuePair<string, TMP_Text>> _localizationTargetsDictionary = new List<KeyValuePair<string, TMP_Text>>();
 
     /// <summary>
     /// Временные данные настроек для UI.
@@ -44,7 +43,7 @@ public class SettingsMenuController
     /// <summary>
     /// Словарь локализуемых UI-элементов.
     /// </summary>
-    public Dictionary<string, TMP_Text> LocalizationTargetsDictionary
+    public List<KeyValuePair<string, TMP_Text>> LocalizationTargetsDictionary
     {
         get => _localizationTargetsDictionary;
     }
@@ -154,13 +153,7 @@ public class SettingsMenuController
                 continue;
             }
 
-            if (_localizationTargetsDictionary.ContainsKey(target.Key))
-            {
-                LogWarning($"Duplicate localization key: {target.Key}.");
-                continue;
-            }
-
-            _localizationTargetsDictionary.Add(target.Key, target.Text);
+            _localizationTargetsDictionary.Add(new KeyValuePair<string, TMP_Text>(target.Key, target.Text));
         }
 
         LogInfo($"Localization targets dictionary built. Count: {_localizationTargetsDictionary.Count}.");
@@ -300,7 +293,7 @@ public class SettingsMenuController
     /// <summary>
     /// Метод записывает информационное сообщение в лог.
     /// </summary>
-    private static void LogInfo(string message)
+    private void LogInfo(string message)
     {
         Logger.Log(LogLevel.Info, nameof(SettingsMenuController), message);
     }
@@ -308,7 +301,7 @@ public class SettingsMenuController
     /// <summary>
     /// Метод записывает предупреждение в лог.
     /// </summary>
-    private static void LogWarning(string message)
+    private void LogWarning(string message)
     {
         Logger.Log(LogLevel.Warning, nameof(SettingsMenuController), message);
     }
@@ -316,7 +309,7 @@ public class SettingsMenuController
     /// <summary>
     /// Метод записывает ошибку в лог.
     /// </summary>
-    private static void LogError(string message)
+    private void LogError(string message)
     {
         Logger.Log(LogLevel.Error, nameof(SettingsMenuController), message);
     }
@@ -345,7 +338,7 @@ public struct ScreenResolutionOption
     public int Height;
 
     /// <summary>
-    /// Создаёт новый вариант разрешения экрана.
+    /// Конструктор создаёт новый вариант разрешения экрана.
     /// </summary>
     /// <param name="width">Ширина.</param>
     /// <param name="height">Высота.</param>
@@ -378,7 +371,7 @@ public struct LocalizationOption
     public string Code;
 
     /// <summary>
-    /// Создаёт новый вариант локализации.
+    /// Конструктор создаёт новый вариант локализации.
     /// </summary>
     /// <param name="name">Имя.</param>
     /// <param name="code">Код.</param>
@@ -406,7 +399,7 @@ public struct LocalizationTarget
     public TMP_Text Text;
 
     /// <summary>
-    /// Создаёт новую привязку локализации.
+    /// Конструктор создаёт новую привязку локализации.
     /// </summary>
     /// <param name="key">Ключ текстового компонента.</param>
     /// <param name="text">Текстовый компонент.</param>

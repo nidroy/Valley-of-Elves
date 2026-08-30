@@ -3,10 +3,10 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 /// <summary>
-/// Контроллер экрана загрузки.
-/// Отвечает за отображение экрана загрузки и асинхронную загрузку сцены.
+/// Контроллер загрузчика сцен.
+/// Отвечает за асинхронную загрузку сцен и отображение экрана загрузки.
 /// </summary>
-public class LoadingScreenController
+public class SceneLoaderController
 {
     #region Поля
 
@@ -37,18 +37,18 @@ public class LoadingScreenController
     #region Конструктор
 
     /// <summary>
-    /// Конструктор создаёт новый контроллер экрана загрузки.
+    /// Конструктор создаёт новый контроллер загрузчика сцен.
     /// </summary>
     /// <param name="coroutineRunner">Объект, запускающий корутины.</param>
     /// <param name="loadingScreen">Экран загрузки. Может быть null.</param>
     /// <param name="minimumLoadingTime">Минимальное время загрузки в секундах.</param>
-    public LoadingScreenController(MonoBehaviour coroutineRunner, GameObject loadingScreen = null, float minimumLoadingTime = 1f)
+    public SceneLoaderController(MonoBehaviour coroutineRunner, GameObject loadingScreen = null, float minimumLoadingTime = 1f)
     {
         _coroutineRunner = coroutineRunner;
         _loadingScreen = loadingScreen;
         _minimumLoadingTime = Mathf.Max(0f, minimumLoadingTime);
 
-        LogInfo($"Loading screen controller created. Loading screen assigned: {(_loadingScreen != null)}, minimum time: {_minimumLoadingTime:0.00}s.");
+        LogInfo($"Scene loader controller created. Loading screen assigned: {_loadingScreen != null}, minimum time: {_minimumLoadingTime:0.00}s.");
     }
 
     #endregion
@@ -58,9 +58,9 @@ public class LoadingScreenController
     #region Публичные методы
 
     /// <summary>
-    /// Метод запускает загрузку сцены.
+    /// Метод запускает асинхронную загрузку сцены.
     /// </summary>
-    /// <param name="sceneName">Название сцены.</param>
+    /// <param name="sceneName">Название загружаемой сцены.</param>
     public void LoadScene(string sceneName)
     {
         if (string.IsNullOrWhiteSpace(sceneName))
@@ -92,12 +92,12 @@ public class LoadingScreenController
     #region Основная логика
 
     /// <summary>
-    /// Корутина загрузки сцены.
+    /// Метод выполняет асинхронную загрузку сцены.
     /// </summary>
-    /// <param name="sceneName">Название сцены.</param>
+    /// <param name="sceneName">Название загружаемой сцены.</param>
     private IEnumerator LoadSceneRoutine(string sceneName)
     {
-        LogInfo($"Loading scene started: {sceneName}");
+        LogInfo($"Scene loading started: {sceneName}");
 
         ShowLoadingScreen();
 
@@ -107,6 +107,10 @@ public class LoadingScreenController
         if (loadOperation == null)
         {
             LogError($"Failed to start async loading for scene: {sceneName}");
+
+            _isLoading = false;
+            HideLoadingScreen();
+
             yield break;
         }
 
@@ -149,40 +153,34 @@ public class LoadingScreenController
     #region Экран загрузки
 
     /// <summary>
-    /// Показывает экран загрузки, если он задан.
+    /// Метод отображает экран загрузки.
     /// </summary>
-    public void ShowLoadingScreen()
+    private void ShowLoadingScreen()
     {
         if (_loadingScreen == null)
         {
-            return;
-        }
-
-        if (_loadingScreen.activeSelf)
-        {
+            LogWarning("Loading screen is not assigned.");
             return;
         }
 
         _loadingScreen.SetActive(true);
+
         LogInfo("Loading screen shown.");
     }
 
     /// <summary>
-    /// Скрывает экран загрузки, если он задан.
+    /// Метод скрывает экран загрузки.
     /// </summary>
-    public void HideLoadingScreen()
+    private void HideLoadingScreen()
     {
         if (_loadingScreen == null)
         {
-            return;
-        }
-
-        if (!_loadingScreen.activeSelf)
-        {
+            LogWarning("Loading screen is not assigned.");
             return;
         }
 
         _loadingScreen.SetActive(false);
+
         LogInfo("Loading screen hidden.");
     }
 
@@ -195,25 +193,25 @@ public class LoadingScreenController
     /// <summary>
     /// Метод записывает информационное сообщение в лог.
     /// </summary>
-    private static void LogInfo(string message)
+    private void LogInfo(string message)
     {
-        Logger.Log(LogLevel.Info, nameof(LoadingScreenController), message);
+        Logger.Log(LogLevel.Info, nameof(SceneLoaderController), message);
     }
 
     /// <summary>
     /// Метод записывает предупреждение в лог.
     /// </summary>
-    private static void LogWarning(string message)
+    private void LogWarning(string message)
     {
-        Logger.Log(LogLevel.Warning, nameof(LoadingScreenController), message);
+        Logger.Log(LogLevel.Warning, nameof(SceneLoaderController), message);
     }
 
     /// <summary>
     /// Метод записывает ошибку в лог.
     /// </summary>
-    private static void LogError(string message)
+    private void LogError(string message)
     {
-        Logger.Log(LogLevel.Error, nameof(LoadingScreenController), message);
+        Logger.Log(LogLevel.Error, nameof(SceneLoaderController), message);
     }
 
     #endregion

@@ -187,7 +187,7 @@ public static class Globals
     /// <summary>
     /// Название сцены по умолчанию.
     /// </summary>
-    public const string GameSaveDefaultSceneName = "Game";
+    public const string GameSaveDefaultSceneName = "Village Scene";
 
     #endregion
 
@@ -211,6 +211,11 @@ public static class Globals
     /// Класс игрока по умолчанию.
     /// </summary>
     public const string PlayerSaveDefaultClass = "Adventurer";
+
+    /// <summary>
+    /// Текст класса игрока (отображаемый класс).
+    /// </summary>
+    public const string PlayerSaveDefaultClassText = "Adventurer";
 
 
 

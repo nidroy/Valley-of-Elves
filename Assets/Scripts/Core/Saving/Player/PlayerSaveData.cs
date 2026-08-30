@@ -23,6 +23,11 @@ public class PlayerSaveData
     /// </summary>
     public string Class = Globals.PlayerSaveDefaultClass;
 
+    /// <summary>
+    /// Текст класса игрока (отображаемый класс).
+    /// </summary>
+    public string ClassText = Globals.PlayerSaveDefaultClassText;
+
 
 
     /// <summary>

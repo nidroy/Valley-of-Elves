@@ -57,8 +57,28 @@
       "Text": "Закрыть"
     },
     {
-      "Key": "Apply button",
-      "Text": "Применить"
+      "Key": "Vampire card text ",
+      "Text": "Вампир"
+    },
+    {
+      "Key": "Dark mage card text",
+      "Text": "Темный маг"
+    },
+    {
+      "Key": "Fire warrior card text",
+      "Text": "Огненный рыцарь"
+    },
+    {
+      "Key": "Ice assassin card text",
+      "Text": "Ледяной убийца"
+    },
+    {
+      "Key": "Player name placeholder",
+      "Text": "Введите имя игрока..."
+    },
+    {
+      "Key": "Player class text",
+      "Text": "Класс игрока"
     },
     {
       "Key": "Loading screen text",

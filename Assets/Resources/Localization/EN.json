@@ -57,8 +57,28 @@
       "Text": "Close"
     },
     {
-      "Key": "Apply button",
-      "Text": "Apply"
+      "Key": "Vampire card text ",
+      "Text": "Vampire"
+    },
+    {
+      "Key": "Dark mage card text",
+      "Text": "Dark mage"
+    },
+    {
+      "Key": "Fire warrior card text",
+      "Text": "Fire warrior"
+    },
+    {
+      "Key": "Ice assassin card text",
+      "Text": "Ice assassin"
+    },
+    {
+      "Key": "Player name placeholder",
+      "Text": "Enter player name..."
+    },
+    {
+      "Key": "Player class text",
+      "Text": "Player class"
     },
     {
       "Key": "Loading screen text",

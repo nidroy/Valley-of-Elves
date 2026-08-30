@@ -55,6 +55,15 @@ public static class PlayerSaveService
     }
 
     /// <summary>
+    /// Свойство получает или устанавливает текст класса игрока.
+    /// </summary>
+    public static string ClassText
+    {
+        get => _playerSaveData.ClassText;
+        set => _playerSaveData.ClassText = value?.Trim() ?? _playerSaveData.ClassText;
+    }
+
+    /// <summary>
     /// Свойство получает или устанавливает уровень игрока.
     /// </summary>
     public static int Level

@@ -33,7 +33,7 @@ public class SettingsData
     /// <summary>
     /// Громкость звуков в диапазоне от 0 до 100.
     /// </summary>
-    public float SoundVolume = Globals.SettingsDefaultMusicVolume;
+    public float SoundVolume = Globals.SettingsDefaultSoundVolume;
 
 
 

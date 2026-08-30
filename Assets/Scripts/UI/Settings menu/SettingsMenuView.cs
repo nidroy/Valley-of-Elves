@@ -713,7 +713,7 @@ public class SettingsMenuView : MonoBehaviour
     /// <summary>
     /// Метод записывает информационное сообщение в лог.
     /// </summary>
-    private static void LogInfo(string message)
+    private void LogInfo(string message)
     {
         Logger.Log(LogLevel.Info, nameof(SettingsMenuView), message);
     }
@@ -721,7 +721,7 @@ public class SettingsMenuView : MonoBehaviour
     /// <summary>
     /// Метод записывает предупреждение в лог.
     /// </summary>
-    private static void LogWarning(string message)
+    private void LogWarning(string message)
     {
         Logger.Log(LogLevel.Warning, nameof(SettingsMenuView), message);
     }
@@ -729,7 +729,7 @@ public class SettingsMenuView : MonoBehaviour
     /// <summary>
     /// Метод записывает ошибку в лог.
     /// </summary>
-    private static void LogError(string message)
+    private void LogError(string message)
     {
         Logger.Log(LogLevel.Error, nameof(SettingsMenuView), message);
     }

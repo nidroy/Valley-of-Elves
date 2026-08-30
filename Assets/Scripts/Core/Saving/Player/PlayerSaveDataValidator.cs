@@ -45,7 +45,7 @@ public static class PlayerSaveDataValidator
         data.Gold = Mathf.Max(0, data.Gold);
 
 
-        
+
         // Имя игрока должно быть задано, если оно пустое.
         if (string.IsNullOrWhiteSpace(data.Name))
         {
@@ -64,6 +64,16 @@ public static class PlayerSaveDataValidator
         else
         {
             data.Class = data.Class.Trim();
+        }
+
+        // Текст класса игрока должен быть задан, если он пустой.
+        if (string.IsNullOrWhiteSpace(data.ClassText))
+        {
+            data.ClassText = Globals.PlayerSaveDefaultClassText;
+        }
+        else
+        {
+            data.ClassText = data.ClassText.Trim();
         }
     }
 }

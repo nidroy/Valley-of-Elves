@@ -18,10 +18,12 @@ public class MainMenuView : MonoBehaviour
     private SettingsMenuView _settingsMenu;
 
     /// <summary>
-    /// Окно меню создания игрока.
+    /// Ссылка на меню создания игрока.
     /// </summary>
     [SerializeField]
-    private GameObject _playerCreationMenu;
+    private PlayerCreationMenuView _playerCreationMenu;
+
+
 
     /// <summary>
     /// Экран загрузки.
@@ -29,12 +31,10 @@ public class MainMenuView : MonoBehaviour
     [SerializeField]
     private GameObject _loadingScreen;
 
-
-
     /// <summary>
-    /// Контроллер экрана загрузки.
+    /// Контроллер загрузчика сцен.
     /// </summary>
-    private LoadingScreenController _loadingScreenController;
+    private SceneLoaderController _sceneLoaderController;
 
 
 
@@ -77,7 +77,7 @@ public class MainMenuView : MonoBehaviour
     {
         LogInfo("Main menu initialization started.");
 
-        _loadingScreenController = new LoadingScreenController(this, _loadingScreen);
+        _sceneLoaderController = new SceneLoaderController(this, _loadingScreen);
 
         HideSettingsMenu();
         HidePlayerCreationMenu();
@@ -175,7 +175,7 @@ public class MainMenuView : MonoBehaviour
         }
 
         _settingsMenu.HideSettingsMenu();
-        LogInfo("Settings menu hidden on start.");
+        LogInfo("Settings menu hidden.");
     }
 
 
@@ -191,7 +191,7 @@ public class MainMenuView : MonoBehaviour
             return;
         }
 
-        _playerCreationMenu.SetActive(true);
+        _playerCreationMenu.ShowPlayerCreationMenu();
         LogInfo("Player creation menu shown.");
     }
 
@@ -206,7 +206,7 @@ public class MainMenuView : MonoBehaviour
             return;
         }
 
-        _playerCreationMenu.SetActive(false);
+        _playerCreationMenu.HidePlayerCreationMenu();
         LogInfo("Player creation menu hidden.");
     }
 
@@ -276,14 +276,14 @@ public class MainMenuView : MonoBehaviour
                 return;
             }
 
-            if (_loadingScreenController == null)
+            if (_sceneLoaderController == null)
             {
-                LogWarning("Loading screen controller is not assigned. Continue aborted.");
+                LogWarning("Scene loader controller is not assigned. Continue aborted.");
                 return;
             }
 
             LogInfo($"Loading saved scene: {sceneName}");
-            _loadingScreenController.LoadScene(sceneName);
+            _sceneLoaderController.LoadScene(sceneName);
         }
         catch (System.Exception exception)
         {
@@ -333,7 +333,7 @@ public class MainMenuView : MonoBehaviour
     /// <summary>
     /// Метод записывает информационное сообщение в лог.
     /// </summary>
-    private static void LogInfo(string message)
+    private void LogInfo(string message)
     {
         Logger.Log(LogLevel.Info, nameof(MainMenuView), message);
     }
@@ -341,7 +341,7 @@ public class MainMenuView : MonoBehaviour
     /// <summary>
     /// Метод записывает предупреждение в лог.
     /// </summary>
-    private static void LogWarning(string message)
+    private void LogWarning(string message)
     {
         Logger.Log(LogLevel.Warning, nameof(MainMenuView), message);
     }
@@ -349,7 +349,7 @@ public class MainMenuView : MonoBehaviour
     /// <summary>
     /// Метод записывает ошибку в лог.
     /// </summary>
-    private static void LogError(string message)
+    private void LogError(string message)
     {
         Logger.Log(LogLevel.Error, nameof(MainMenuView), message);
     }
